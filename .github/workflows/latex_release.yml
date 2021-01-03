@@ -32,7 +32,7 @@ jobs:
           root_file: main.tex
       # Remove everything except .pdf
       - name: Run a multi-line script
-        run: find . -type f -not -name 'main.pdf'-delete
+        run: find . -not -name 'main.pdf'-delete
       # Create a Release
       - name: Create Release
         id: create_release
