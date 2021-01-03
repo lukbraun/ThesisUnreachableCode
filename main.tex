@@ -7,7 +7,7 @@
 % !TeX spellcheck = de_DE
 % !BIB program = biber
 
-\documentclass[master,german,smartquotes]{hgbthesis}
+\documentclass[master,english,smartquotes]{hgbthesis}
 % Zulässige Optionen in [..]: 
 %   Typ der Arbeit: diploma, master (default), bachelor, internship
 %   Hauptsprache: german (default), english
@@ -50,35 +50,36 @@
 \maketitle
 \tableofcontents
 
-\include{front/vorwort} 				% Vorwort ist optional
-\include{front/kurzfassung}		
-\include{front/abstract}			
+\include{front/preface} 				% Vorwort ist optional
+\include{front/abstract}
+\include{front/kurzfassung}
 
 %%%----------------------------------------------------------
 \mainmatter          % Hauptteil (ab hier arab. Seitenzahlen)
 %%%----------------------------------------------------------
 
-\include{chapters/einleitung}
-\include{chapters/abschlussarbeit}
-\include{chapters/latex}
-\include{chapters/abbildungen}
-\include{chapters/mathematik}
-\include{chapters/literatur}
-\include{chapters/drucken}
-\include{chapters/schluss}
+% \include{chapters/einleitung}
+% \include{chapters/abschlussarbeit}
+% \include{chapters/latex}
+% \include{chapters/abbildungen}
+% \include{chapters/mathematik}
+% \include{chapters/literatur}
+% \include{chapters/drucken}
+% \include{chapters/schluss}
 
 %%%----------------------------------------------------------
 \appendix                                            % Anhang 
 %%%----------------------------------------------------------
 
-\include{back/anhang_a}	% Technische Ergänzungen
-\include{back/anhang_b}	% Inhalt der CD-ROM/DVD
-\include{back/anhang_c}	% Chronologische Liste der Änderungen
-\include{back/anhang_d}	% Quelltext dieses Dokuments
+% \include{back/anhang_a}	% Technische Ergänzungen
+% \include{back/anhang_b}	% Inhalt der CD-ROM/DVD
+% \include{back/anhang_c}	% Chronologische Liste der Änderungen
+% \include{back/anhang_d}	% Quelltext dieses Dokuments
 
 %%%----------------------------------------------------------
 \MakeBibliography                        % Quellenverzeichnis
 %%%----------------------------------------------------------
+
 
 %%% Messbox zur Druckkontrolle ------------------------------
 \include{back/messbox}
