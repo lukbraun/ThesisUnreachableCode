@@ -1,3 +1,5 @@
+%!TEX root = ../main.tex
+
 \chapter{Introduction}
 \label{cha:introduction}
 
@@ -77,8 +79,8 @@ Over the years multiple rules identifying a wide range of errors were implemente
 Currently a rule for detecting unreachable Code is already in place, but is incomplete.
 The only kind of \emph{Unreachable Code} that is detected when Statements stop the \emph{Controlflow} unconditionally (e.g. break, return, exit, goto, etc.).
 The goal is to identify as much \emph{Unreachable Code} as possible correctly while minimizing the number of reported false positives.
-A popular approch to finding \emph{Unreachable Code} is converting a \emph{Controlflow Graph} into \emph{Single Static Assignment Form} and using \emph{Constant Propagation} \cite{Click_1995}.
-Afterwards Condtions may be evaluated if they only consist of constants. The result (either true or false) determines if a given part of sourcecode is always or never will be reachable (as mentioned before, only Conditions with constants only will be evaluated).
+A popular approach to finding \emph{Unreachable Code} is converting a \emph{Controlflow Graph} into \emph{Single Static Assignment Form} and using \emph{Constant Propagation} \cite{Click_1995}.
+Afterwards Conditions may be evaluated if they only consist of constants. The result (either true or false) determines if a given part of source code is always or never will be reachable (as mentioned before, only Conditions with constants only will be evaluated).
 This method is efficient and yields good results, but is not able to detect every error.
 \begin{figure}
     \begin{GenericCode}
@@ -100,5 +102,5 @@ The developed Method will make usage of a \emph{Satisfiable modulo theory prover
 
 At the end the advantages and disadvantages of both algorithms will be discussed and the results will be compared against each other in terms of accuracy and runtime.
 
-% TODO: Fix Inhaltsverzeichnis
-% TODO: Seitenzahl eintragen
+
+
