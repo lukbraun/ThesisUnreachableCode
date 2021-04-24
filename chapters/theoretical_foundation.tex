@@ -1,14 +1,29 @@
 %!TEX root = ../main.tex
 
-\chapter {Theoretical Foundation}
+\chapter {Theoretical Foundation \textasciitilde 15 sites}
 \label {cha:theoretical foundation}
-\emph{7-10 Sites}
 
-\section{Kemro-IEC 61131-3}
-\section{Static Code Analysis}
-\section{Abstract Syntax Tree}
-\section{Controlflow Graph}
-\section{Single Static Assignment Form}
-\section{Constant Propagation}
-\section{Satisfiable Modulo Theory}
-\section{Logic Programming and Unification}
+\section{Unreachable Code  \textasciitilde 1 site}
+\subsection{Difference to Dead Code \textasciitilde 1/3 site}
+\subsection{Difference to Unused Code \textasciitilde 1/3 site}
+\subsection{Difference to Unnecessary Code \textasciitilde 1/3 site}
+\section{Kemro-IEC 61131-3 \textasciitilde 3 sites}
+% TODO: Sprachfeatures beschreiben
+\section{Abstract Syntax Tree \textasciitilde 1 site}
+\section{Controlflow Graph \textasciitilde 1 sites}
+\section{Single Static Assignment Form \textasciitilde 1 sites}
+\section{Constant Propagation \textasciitilde 1 sites}
+
+\section{Satisfiable Modulo Theory \textasciitilde 3 sites}
+In recent decades the use of 
+\subsection{Satisfiability Prover \textasciitilde 1 site}
+\subsection{SMT-LIB \textasciitilde 1 sites}
+SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more. % https://smtlib.cs.uiowa.edu/
+By using the same input and output format SMT-Solvers may be exchanged at any time. 
+This format is LISP-like and shares the same characteristics and being a functional programming language. 
+For example mutations are not permitted and there is no possiblity of using traditional loops (which may be replaced by recursion).
+Usually a SMT-LIB programm begins with declaring functions. Variables are also represented as functions. 
+Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
+The last part contains an instruction for the SMT-Solver to check the satisfiability. 
+Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
+SMT-Solvers may also implement the simplification of a given expression.
