@@ -5,6 +5,16 @@
 \label{cha:finding unreachable code using a smt-solver}
 \emph{10 Sites}
 
+The developed approach uses the \emph{Control-flow graph} as a basis like described in \ref{sec:building cfg}, but does not transform it into \emph{Single static Assignment} form.
+During analysis the \emph{Control-flow graph} will be traversed and interpreted like the program will be executed.
+After each interpretation state (e.g. \emph{Assignments}, \emph{Path Conditions}) will be added accordingly and must be taken into account.
+Merging of state has to be handled correctly to make correct statements about the current value of a variable.
+The state is represented in the form of a predicate, which may be checked by a system capable of determining satisfiability (e.g. an \emph{SMT-Solver}).
+A satisfiable result will continue with the next block(s) and using the new state as a basis and flag this block as visitable.
+An unsatisfiable result stops the computation at the current block and will not pursue to continue the current path.
+Therefore this method is pessimistic.
+
+
 % % Vorgangsweise beschreiben
 % \section{Prerequisites}
 % \subsection{Parsing the Abstract Syntax Tree \textasciitilde 1 site}
