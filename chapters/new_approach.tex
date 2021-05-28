@@ -1,6 +1,5 @@
 %!TEX root = ../main.tex
 
-% 
 \chapter{Finding unreachable code using a SMT-Solver \textasciitilde 10 sites}
 \label{cha:finding unreachable code using a smt-solver}
 \emph{10 Sites}
@@ -13,6 +12,13 @@ The state is represented in the form of a predicate, which may be checked by a s
 A satisfiable result will continue with the next block(s) and using the new state as a basis and flag this block as visitable.
 An unsatisfiable result stops the computation at the current block and will not pursue to continue the current path.
 Therefore this method is pessimistic.
+Using this method every error should be found in theory (as described in \ref{cha:conclusion}), since every instruction will be handled like during execution. 
+This entails barriers such as: 
+\begin{itemize}
+	\item Significant increase in time needed for analysis. 
+	\item Possibly exponentially growing expressions to determine satisfiability.
+\end{itemize}
+These problems lead to greater execution time, which requires the implementation of actions (e.g. early stopping, assuming values for variables in loops).
 
 
 % % Vorgangsweise beschreiben
