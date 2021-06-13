@@ -7,7 +7,7 @@
 The developed approach uses the \emph{Control-flow graph} as a basis like described in \ref{sec:building cfg}, but does not transform it into \emph{Single static Assignment} form.
 During analysis the \emph{Control-flow graph} will be traversed and interpreted like the program will be executed.
 After each interpretation state (e.g. \emph{Assignments}, \emph{Path Conditions}) will be added accordingly and must be taken into account.
-Merging of state has to be handled correctly to make correct statements about the current value of a variable.
+Merging state has to be handled correctly to make correct statements about the current value of a variable.
 The state is represented in the form of a predicate, which may be checked by a system capable of determining satisfiability (e.g. an \emph{SMT-Solver}).
 Satisfiable results will continue with the next block(s) and using the new state as a basis and flag this block as visitable.
 Unsatisfiable results stop the computation at the current block and will not pursue to continue the path.
@@ -20,6 +20,13 @@ This entails barriers such as:
 \end{itemize}
 These problems lead to greater execution time, which requires the implementation of reactions (e.g. early stopping, assuming values for variables in loops).
 
+\section{Architecture}
+The implementation is part of an already developed static code analysis project \cite{Prahofer_2012}. It is extended by this implementation as a rule. 
+Parser, rule-framework and different representations of the Abstract Syntax Tree (e.g. Control-flow Graph) were already implemented. 
+Also many rules of different complexities were implemented and also may be configured to some extent. 
+Each rule "triggers" at certain nodes of the \emph{Abstract Syntax tree}, checks conditions and eventually reports a violation. 
+Violations contain information on where the error is reported as well as what type of error it is. 
+In the end it will be written to a XML-File which will be used in conjunction with sonar-qube to highlight errors directly in the source-code in a user interface.
 
 \section{Translation of Functions}
 \label{sec:translation}
@@ -32,10 +39,10 @@ Two separate procedures will be performed on this Control-flow Graph.
 \end{enumerate}
 \subsection{Translation of Instructions}
 % Types of instructions
-Instructions come in three different types and must be marked accordingly:
+Instructions come in three different types \ref{fig:state} and must be marked accordingly:
 \begin{enumerate}
 	\item \emph{Assignments} are usually the most common form of instruction. They denote a change of the underlying value of a variable and therefore reset the state (of said variable) during analysis. 
-	\item \emph{Conditions} occur only as the last instruction of a block from a \emph{Control-flow Graph}. Note that the last Instruction does not necessarily to be a \emph{condition}.
+	\item \emph{Conditions} occur only as the last instruction of a block from a \emph{Control-flow Graph}. Note that the last Instruction does not necessarily has to be a \emph{condition}.
 	\item \emph{Procedure Calls} may be mutable and could change variables, if they a are applied as \emph{Output-Parameters}. Procedure Calls will be dissolved into \emph{Assignments} during analysis.
 \end{enumerate}
 \begin{figure}[h!]
@@ -46,7 +53,7 @@ Instructions come in three different types and must be marked accordingly:
 \end{figure}
 
 % AST-Object representation of instructions
-Every Instruction will also be represented in an \emph{Abstract-Syntax-Tree}-like notation. Each Symbol, for example a variable, name of a function or any given literal (like numbers and strings), are represented as an \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure Calls, but also operations (like \emph{+} and \emph{-}). User-defined Functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since Named Parameters are a language feature of IEC and therefore must be handled correctly), which will be - again - represented as \emph{BaseObjects}. 
+Every Instruction will also be represented in an \emph{Abstract-Syntax-Tree}-like notation \ref{fig:smtobject}. Each Symbol, for example a variable, name of a function or any given literal (like numbers and strings), are represented as an \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure Calls, but also operations (like \emph{+} and \emph{-}). User-defined Functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since Named Parameters are a language feature of IEC and therefore must be handled correctly), which will be - again - represented as \emph{BaseObjects}. 
 
 
 \begin{figure}[h!]
@@ -57,9 +64,9 @@ Every Instruction will also be represented in an \emph{Abstract-Syntax-Tree}-lik
 \end{figure}
 \section{Analysis}
 \label{sec:analysis}
-After translation of all \emph{Functions} and \emph{Instructions} the analysis begins. As mentioned in the introduction \ref{cha:finding unreachable code using a smt-solver} of this chapter the \emph{Control-flow Graph} of every function (and procedure) will be traversed. The analysis begins at the single \emph{Begin-Block} of the graph and ends, when all feasible paths reached the \emph{Exit-Block}. \emph{Instruction-Blocks} will be evaluated in Order - the same as a program would execute them. 
+After the translation of all \emph{Functions} and \emph{Instructions} the analysis begins. As mentioned in the introduction \ref{cha:finding unreachable code using a smt-solver} of this chapter the \emph{Control-flow Graph} of every function (and procedure) will be traversed. The analysis begins at the single \emph{Begin-Block} of the graph and ends, when all feasible paths reached the \emph{Exit-Block}. \emph{Instruction-Blocks} will be evaluated in Order - the same as a program would execute them. 
 For each \emph{Instruction-Block} the \emph{Instructions} will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an \emph{Instruction-Block} a \emph{SMT-Solver} is used to determine if the current state is feasible or not. Infeasible State may be reached by a combination of \emph{Conditions}. If the current state is infeasible, the \emph{next} block must be unreachable, since the \emph{Condition} at the end of an \emph{Instruction-Block} determines which branch the flow follows. 
-For the determination, if the current state is feasible or not, the \emph{SMT-Solver Z3}\cite{demouraZ3EfficientSMT2008} was used. The state will be simply translated into the universal, standardized, LISP-like \emph{SMT-Lib} language which most of the common \emph{SMT-Solvers} are able to interpret. 
+For the determination, if the current state is feasible or not, the \emph{SMT-Solver Z3}\cite{demouraZ3EfficientSMT2008} was used. The state will be simply translated into the universal, standardized, LISP-like \emph{SMT-Lib} language \ref{code:translation} which most of the common \emph{SMT-Solvers} are able to interpret. 
 If an \emph{Instruction-Block} is reachable (at least on one occasion) it will be marked as reachable. At the end of the analysis all remaining \emph{Instruction-Blocks} are marked unreachable.
 % TODO: add example for translation
 \begin{figure}[h!]
@@ -86,7 +93,7 @@ If an \emph{Instruction-Block} is reachable (at least on one occasion) it will b
 		(check-sat)
 		; => UNSAT
 	\end{GenericCode}
-	\caption{Translation of the IEC-Code. As shown above, each variable must be declared beforehand (therefore the implementation must be aware of the type). The assertion includes the complete state (including \emph{Assignments} and \emph{Conditions}). Conditions are the only part which could lead to an unfeasible result. Every Instruction-Block must contain at least one edge out of the block (with the exception of the \emph{Exit-Block}), but may also contain a second edge, indicating the path if a condition evaluates false. Therefore the condition must be negated.}
+	\caption{Translation of the IEC-Code. As shown above, each variable must be declared beforehand (therefore the implementation must be aware of the type). The assertion includes the complete state (including \emph{Assignments} and \emph{Conditions}). Conditions are the only part which could lead to an unfeasible result. Every Instruction-Block must contain at least one edge out of the block (with the exception of the \emph{Exit-Block}), but may also contain a second edge, indicating the path of a condition evaluates false. Therefore the condition must be negated.}
 	\label{code:translation}
 \end{figure}
 
@@ -99,7 +106,7 @@ If an \emph{Instruction-Block} is reachable (at least on one occasion) it will b
 	\centering
 	\includegraphics[width=0.2\textwidth]{assignmentsOnly}
 	\includegraphics[width=0.5\textwidth]{assignmentsOnly_analysis}
-	\caption{TODO: enhance Image on right side. Demonstration of simple Assignments and Reassignments. The resulting \emph{SMT-Lib} Code is displayed on the next Block.}
+	\caption{(TODO: enhance Image on right side.) Demonstration of simple Assignments and Reassignments. The resulting \emph{SMT-Lib} Code is displayed on the next Block.}
 	\label{fig:assignmentOnly}
 \end{figure}
 
@@ -113,7 +120,7 @@ If an \emph{Instruction-Block} is reachable (at least on one occasion) it will b
 	\centering
 	\includegraphics[width=0.2\textwidth]{simpleIf}
 	\includegraphics[width=0.5\textwidth]{simpleIf_analysis}
-	  \caption{TODO: enhance Image on right side. Simple selection (IF). The flow is divided into to branches - the condition could either be TRUE or FALSE. Each path will be evaluated separately. }
+	  \caption{(TODO: enhance Image on right side.) Simple selection (IF). The flow is divided into to branches - the condition could either be TRUE or FALSE. Each path will be evaluated separately. }
 	\label{fig:simpleIf}	
 \end{figure}
 
@@ -126,7 +133,7 @@ If an \emph{Instruction-Block} is reachable (at least on one occasion) it will b
 	\centering
 	\includegraphics[width=0.2\textwidth]{simpleLoop}
 	\includegraphics[width=0.7\textwidth]{simpleLoop_analysis}
-	  \caption{TODO: enhance Image on right side. After each iteration the condition will be evaluated with the new state again. Every Node is reachable, even tough the analysis stopped prematurely, since the analysis could eventually be indefinitely. }
+	  \caption{(TODO: enhance Image on right side.) After each iteration the condition will be evaluated with the new state again. Every Node is reachable, even tough the analysis stopped prematurely, since the analysis could eventually be indefinitely. }
 	\label{fig:simpleLoop}
 \end{figure}
 
@@ -142,7 +149,7 @@ If an \emph{Instruction-Block} is reachable (at least on one occasion) it will b
 	\centering
 	\includegraphics[width=0.2\textwidth]{unconditionalJump}
 	\includegraphics[width=0.5\textwidth]{unconditionalJump_analysis}
-	  \caption{TODO: enhance Image on right side. \emph{Instruction-Block} 4 is not reachable, since the flow was interrupted by an unconditional jump.}
+	  \caption{(TODO: enhance Image on right side.) \emph{Instruction-Block} 4 is not reachable, since the flow was interrupted by an unconditional jump.}
 	\label{fig:unconditionalJump}
 \end{figure}
 
@@ -150,12 +157,12 @@ If an \emph{Instruction-Block} is reachable (at least on one occasion) it will b
 \label{sub:Interpretation of Instructions}
 % Handling of and state management
 One of the central parts during analysis is the handling of state. Each Instruction must have the same effect as it was executed after compilation. 
-As described before, State comes in three forms: Assignment, Condition, Procedure-/Function-call, which all must be handled accordingly. 
+As described before, State comes in three forms: \emph{Assignment}, \emph{Condition}, \emph{Procedure-/Function-call}, which all must be handled accordingly. 
 
 \begin{itemize}
 	\item Conditions are just added to the state as they are. 
 	\item Assignments have to be handled differently. Assignments change the current value of a variable and therefore the path condition is not valid afterwards. It must be reset therefore. 
-		If there is any variable on the left side, it must be replaced by its value. Especially cases which contain the same variable on the left and right side must use the values instead of the identifier, since a SMT-Solver does not contain any mechanism for reassignment, but rather a bidirectional Unification. The statement (= x (+ x 1)) will always result in an unsatisfiable state.
+		If there is any variable on the right side, it must be replaced by its value. Especially cases which contain the same variable on the left and right side must use the values instead of the identifier, since a SMT-Solver does not contain any mechanism for reassignment, but rather a bidirectional Unification. For example the statement (= x (+ x 1)) will always result in an unsatisfiable state.
 	\item Procedure-/Function-calls will be handled as described in \ref{sub:handling procedure and function calls}. If any OUT parameter or the return value will represented as Assignments. 
 \end{itemize}
 
@@ -164,14 +171,14 @@ The state will be passed on until unreachable code is detected or the exit block
 
 \subsection{Early stopping}
 \label{sub:early stopping}
-Ideally the analysis takes as much time as possible. Realistically this is not possible to accomplish, therefore mechanisms to stop the computation early must be implemented.
+Ideally the analysis takes as much time as possible and needed. Realistically this is impossible to accomplish, therefore mechanisms to stop the computation early must be implemented.
 Due to possible mutable state it is not easy to determine values without interpreting the flow of the program. This is the main reason the approach \ref{cha:state of the art} does not detect possible unreachable Code in loops \ref{code:ssa-defect}. 
 But being able to find this kind of defects comes with greater execution time. Without proper guards the analysis would take an infinite amount of resources and never find a solution.
 \begin{itemize}
 	\item One of the simplest mechanisms could be, that as soon as every \emph{Instruction-Block} is marked as reachable, the analysis should stop.
 	\item As soon as loops are involved a multitude of different strategies would come to mind. 
 	\begin{itemize}
-		\item Following the flow of a loop a maximum set amount of time. Note that this approach could lead to false-positives, since the Loop only partly finished. 
+		\item Following the flow of a loop a maximum set amount of time. Note that this approach could lead to false-positives, since the Loop only finished partly. 
 		\item Stopping the analysis as soon as too many iterations were made. No false positives will be reported, but the analysis is incomplete.
 		\item Resetting the state of every assigned variable inside the body of the loop. Therefore no false positives will be reported, but may overlook some instances of unreachable code.
 	\end{itemize}
@@ -179,15 +186,15 @@ But being able to find this kind of defects comes with greater execution time. W
 
 \subsection{Handling Procedure - and Function-calls}
 \label{sub:handling procedure and function calls}
-Procedure - and Function-calls are handled \emph{Intraprocedural} - meaning return-values are not calculated. That simply means, that every Function-Call just checks, if the declaration contains any (mutable) In- and Out-parameters or is used on the right-hand side of an Assignment.
+Procedure - and Function-calls are handled \emph{Intraprocedural} - meaning return-values are not calculated. That simply means every Function-Call just checks if the declaration contains any (mutable) In- and Out-parameters or is used on the right-hand side of an Assignment.
 Either way said variables must reset their state, since the value may change. 
-This approach is definitely lighter on the resources, but may not able to detect certain defects which may or may not be obvious to a human. Consider the usage of the identity function. Since the \emph{Intraprocedural approach} does not consider the body of the called function, the state must reset the assigned variable, even tough it does not change.
+This approach is definitely lighter on resources (in contrast to \emph{Interprocedural} analysis), but may not able to detect certain defects which may be obvious to a human. Consider the usage of the identity function. Since the \emph{Intraprocedural approach} does not consider the body of the called function, the state must reset the assigned variable, even tough it does not change.
 
 \subsection{Problems and Barriers}
 \label{sub:problems and barriers}
-Especially evaluating loops is not gentle on resources and processing power. The number of blocks to evaluate grows exponentially. Naturally loops are very common. In theory this approach could find every instance of unreachable code, only limited by available resources. Multiple strategies \ref{sub:early stopping}  may be applied to reduce the number of iterations.
+Especially the evaluation of loops is not gentle on resources and processing power. The number of blocks to evaluate grows exponentially. Naturally loops are very common. In theory this approach could find every instance of unreachable code, only limited by available resources. Multiple strategies \ref{sub:early stopping}  may be applied to reduce the number of iterations.
 The consequences of these strategies are, that not every instance of unreachable code can be detected, making this method not necessarily superior to the traditionally implemented approach \ref{cha:state of the art}. 
-It may be possible to use some sort of preprocessing and potentially make it possible to evaluate loops only once, which could drastically reduce the execution time and power.
+It may be possible to use some sort of preprocessing and potentially make it possible to evaluate loops only once, which could reduce the execution time drastically.
 The implementation of such a form of preprocssing must take mutations into account and ideally guarantee the same accuracy.
-Without any preprocessing \emph{Interproecural} analysis of \emph{Function-/Procedure-calls} may also increase execution time significantly, since the must be interpreted as well. Here also some sort of preprocessing would be interessting. For example the combination of all influences on return values could be returned. 
+Without any preprocessing \emph{Interproecural} analysis of \emph{Function-/Procedure-calls} may also increase execution time significantly, since the must be interpreted as well. Here also some sort of preprocessing would be interesting. For example the combination of all influences on return values could be returned. 
 Recursive Functions (directly and indirectly) would also lead to an increase of execution time.
