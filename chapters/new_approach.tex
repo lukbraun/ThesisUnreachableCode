@@ -29,7 +29,7 @@ Some rules collect metrics, like lines of code, code complexity, nesting level, 
 Rules get triggered by certain nodes of the abstract syntax tree, like declarations of variables, function calls, arithmetic expression, et cetera.
 For analysis the rule executor traverses the abstract syntax tree and triggers the specified rules provided in the configuration file.
 Rules may need different representations of these nodes for more sophisticated analysis. 
-When rules are broken, violations will be generated. They contain position, causation and the error message. Violations are written to a XML file, which can imported to sonarqube.
+When rules are broken, violations will be generated. They contain position, causation and the error message. Violations are written to a XML file, which can be imported to sonarqube\cite{sonarqube}.
 
 
 The detection of unreachable code will be implemented in form of a rule as seen in figure \ref{fig:unreachable-architecture-overview}, the next section \ref{sec:translation} covers the translation from the abstract syntax tree to a general control flow graph. 
@@ -39,7 +39,7 @@ The analysis is covered in section \ref{sec:analysis}.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{static-code-analysis}
-	\caption{Architectural overview of the Static code analysis tool for IEC Source code. After parsing IEC-sources the AST will be passed to the RuleExecutor, which triggers only the configured rules. These rules are implemented as Java classes, which get triggered at certain nodes in the AST. For more advanced analysis the AST may be transformed into a different representation. When the source code does not conform to the rules violations will be generated, which can be integrated with sonarqube.}
+	\caption{Architectural overview of the static code analysis tool for IEC Source code. After parsing IEC-sources the AST will be passed to the RuleExecutor, which triggers only the configured rules. For more advanced analysis the AST may be transformed into a different representation. When the source code does not conform to the rules violations will be generated, which can be integrated with sonarqube.}
 	\label{fig:general architecture}
 \end{figure}
 
@@ -104,8 +104,8 @@ Instructions come in three different types (shown in figure \ref{fig:state}) and
 \begin{enumerate}
 	\item \emph{Assignments} are usually the most common form of instruction. They denote a change of the underlying value of a variable and therefore reset the state (of said variable) during analysis. 
 	\item \emph{Conditions} occur only as the last instruction of a block from a \emph{Control-flow Graph}. Note that the last Instruction does not necessarily has to be a \emph{condition}.
-	\item \emph{Procedure calls} may be mutable and could change variables, if they a are applied as \emph{output parameters}. % Procedure calls will be dissolved into \emph{assignments} during analysis.
-	For intraprocedural analysis of procedures output parameters will be dissolved into assignments to simplify the process. Basically it is assumed that out parameters get an unknown value assigned. 
+	\item \emph{Procedure calls} may be mutable and could change variables, if they are applied as \emph{output parameters}. % Procedure calls will be dissolved into \emph{assignments} during analysis.
+	For intraprocedural analysis of procedures output parameters will be dissolved into assignments to simplify the process. Basically it is assumed that out parameters get an unknown value assigned, which consequently reset the state of the variable and may contain any possible value (only taking the datatype into account).
 \end{enumerate}
 \begin{figure}[h!]
 	\centering
@@ -127,13 +127,13 @@ This kind of representation makes it easy to work with, since it is a very easy,
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.2\textwidth]{SMTObject}
-	\caption{\emph{AST}-like representation of instructions. This kind of representation makes it easy to work with, since it is a very easy, tree-like data-structure which may be traversed easily. Not only replacing variables and values may be done effortlessly, but also the generation of \emph{SMT-Lib} Code, since this representation is similar to \emph{LISP}.}
+	\caption{\emph{AST}-like representation of instructions. }
 	\label{fig:smtobject}
 \end{figure}
 \section{Analysis}
 \label{sec:analysis}
-After the translation of all functions and instructions the analysis begins. As mentioned in the introduction \ref{cha:finding unreachable code using a smt-solver} of this chapter the control flow graph of every function (and procedure) will be traversed. The analysis begins at the single begin block of the graph and ends, when all feasible paths reached the exit block. instruction blocks will be evaluated in order - the same as a program would execute them. 
-For each instruction block the instructions will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an Instruction block a SMT-solver is used to determine if the current state is feasible or not. Infeasible State may be reached by a combination of conditions. If the current state is infeasible, the \emph{next} block must be unreachable, since the condition at the end of an instruction block determines which branch the flow follows. 
+After the translation of all functions and instructions the analysis begins. As mentioned in the introduction \ref{cha:finding unreachable code using a smt-solver} of this chapter the control flow graph of every function (and procedure) will be traversed. The analysis begins at the single begin block of the graph and ends, when all feasible paths reached the exit block. Instruction blocks will be evaluated in order - the same as a program would execute them. 
+For each instruction block the instructions will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an instruction block a SMT-solver is used to determine if the current state is feasible or not. Infeasible State may be reached by a combination of conditions. If the current state is infeasible, the \emph{next} block must be unreachable, since the condition at the end of an instruction block determines which branch the flow follows. 
 For the determination, if the current state is feasible or not, the SMT-solver Z3\cite{demouraZ3EfficientSMT2008} was used. The state will be simply translated into the universal, standardized, LISP-like SMT-Lib language \ref{code:translation} which most of the common SMT-solvers are able to interpret. 
 If an instruction block is reachable (at least on one occasion) it will be marked as reachable. At the end of the analysis all remaining instruction blocks are marked unreachable.
 
@@ -144,6 +144,7 @@ If an instruction block is reachable (at least on one occasion) it will be marke
 			$state.add($$\downarrow$ $instruction$$)$
 		else if $instruction.isAssignment()$ then
 			// replace all occurences of variables with their concrete values
+			// from the provided $states$ variable
 			$replaceVariables($$\updownarrow$ $instruction$, $\downarrow$ $state$$)$ 
 			// remove old state e.g. former Assignments and Conditions, which are not
 			// valid anymore
@@ -175,7 +176,7 @@ If an instruction block is reachable (at least on one occasion) it will be marke
 		$state.removeState($$\downarrow$ $outParams$$)$
 	end		
 	\end{GenericCode}
-	\caption{Function calls will be handled in an intra-procedural manner. This is simply realized by just removing any state containing a variable which may change and will be handled like a assignment, whereas the new value is unknown. }
+	\caption{Function calls will be handled in an intra-procedural manner. This is simply realized by just removing any state containing a variable which may change and will be handled like an assignment, whereas the new value is unknown. }
 	\label{code:intraprocedural analysis}
 \end{figure}
 \begin{figure}[h!]
@@ -279,7 +280,7 @@ The last example show in figure \ref{fig:unconditionalJump} shows an example con
 		$i$ $\leftarrow$ $x$
 	\end{GenericCode}
 	\centering
-	\includegraphics[width=0.25\textwidth]{assignmentsOnly}
+	\includegraphics[width=0.3\textwidth]{assignments-only-cfg}
 	\includegraphics[width=0.3\textwidth]{assignments-only}
 	\caption{Demonstration of simple assignments and reassignments. The resulting SMT-Lib code is displayed on the next block.}
 	\label{fig:assignmentOnly}
@@ -294,8 +295,8 @@ The last example show in figure \ref{fig:unconditionalJump} shows an example con
 		end
 	\end{GenericCode}
 	\centering
-	\includegraphics[width=0.25\textwidth]{simpleIf}
-	\includegraphics[width=0.3\textwidth]{simple-if}
+	\includegraphics[width=0.4\textwidth]{simple-if-cfg}
+	\includegraphics[width=0.4\textwidth]{simple-if}
 	\caption{Simple selection (IF). The flow is divided into to branches - the condition could either be TRUE or FALSE. Each path will be evaluated separately. }
 	\label{fig:simpleIf}	
 \end{figure}
@@ -307,8 +308,8 @@ The last example show in figure \ref{fig:unconditionalJump} shows an example con
 		end		
 	\end{GenericCode}
 	\centering
-	\includegraphics[width=0.25\textwidth]{simpleLoop}
-	\includegraphics[width=0.3\textwidth]{simple-loop}
+	\includegraphics[width=0.4\textwidth]{simple-loop-cfg}
+	\includegraphics[width=0.4\textwidth]{simple-loop}
 	\caption{After each iteration the condition will be evaluated with the new state again. Every Node is reachable, even tough the analysis stopped prematurely, since the analysis could eventually be indefinitely. }
 	\label{fig:simpleLoop}
 \end{figure}
@@ -323,8 +324,8 @@ The last example show in figure \ref{fig:unconditionalJump} shows an example con
 		end
 	\end{GenericCode}
 	\centering
-	\includegraphics[width=0.2\textwidth]{unconditionalJump}
-	\includegraphics[width=0.3\textwidth]{unconditional-jump}
+	\includegraphics[width=0.4\textwidth]{unconditional-jump-cfg}
+	\includegraphics[width=0.4\textwidth]{unconditional-jump}
 	\caption{Instruction block 4 is not reachable, since the flow was interrupted by an unconditional jump.}
 	\label{fig:unconditionalJump}
 \end{figure}
@@ -349,7 +350,7 @@ But being able to find this kind of defects comes with greater execution time. W
 \label{sub:handling procedure and function calls}
 Procedure - and function-calls are handled intraprocedural - meaning return values are not calculated. That simply means every function call just checks if the declaration contains any (mutable) in- and out parameters or is used on the right hand side of an assignment.
 Either way said variables must reset their state, since the value may change. 
-This approach is definitely lighter on resources (in contrast to interprocedural analysis), but may not able to detect certain defects which may be obvious to a human. Consider the usage of the identity function. Since the intraprocedural approach does not consider the body of the called function, the state must reset the assigned variable, even tough it does not change.
+This approach is definitely lighter on resources (in contrast to interprocedural analysis), but may not be able to detect certain defects which may be obvious to a human. Consider the usage of the identity function. Since the intraprocedural approach does not consider the body of the called function, the state must reset the assigned variable, even tough it does not change.
 
 \subsection{Problems and Barriers}
 \label{sub:problems and barriers}
@@ -357,5 +358,5 @@ Especially the evaluation of loops is not gentle on resources and processing pow
 The consequences of these strategies are, that not every instance of unreachable code can be detected, making this method not necessarily superior to the traditionally implemented approach.
 It may be possible to use some sort of preprocessing and potentially make it possible to evaluate loops only once, which could reduce the execution time drastically.
 The implementation of such a form of preprocssing must take mutations into account and ideally guarantee the same accuracy.
-Without any preprocessing interproecural analysis of function-/procedure calls may also increase execution time significantly, since the must be interpreted as well. Here also some sort of preprocessing would be interesting. For example the combination of all influences on return values could be returned. 
+Without any preprocessing interproecural analysis of function-/procedure calls may also increase execution time significantly, since they must be interpreted as well. Here also some sort of preprocessing would be interesting. For example the combination of all influences on return values could be returned. 
 Recursive functions (directly and indirectly) would also lead to an increase of execution time.

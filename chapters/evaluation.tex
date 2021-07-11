@@ -1,18 +1,30 @@
 %!TEX root = ../main.tex
 
-\chapter {Evaluation \textasciitilde 10 sites}
+\chapter {Evaluation}
 \label {cha:evaluation}
-This chapter contains interesting IEC-Functions and Procedures, either found in production code or collected and translated from literature.
-Each example provides the code, the \emph{Control-flow graph}, a description and some metrics, like execution time, number of InstructionBlocks needed to conclude the result and, most importantly, the reported violations.
+This chapter contains interesting IEC functions and procedures, either found in production code or collected and translated from literature.
+Each example provides the code, the control flow graph, a description and some metrics, like execution time, number of instruction blocks needed to conclude the result and, most importantly, the reported violations.
 
 
-\section{Basic Example \textasciitilde 2 Site}
-This example \ref{code:basic example 1} was found in production code and was the motivation for this implementation and thesis. There are no loops or Procedure-calls present, which change the variables provided as parameters (even tough there are Procedure-calls, they can not change them, since they are only declared as input variables).
+\section{Basic Example}
+This example \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even tough there are procedure calls, they can not change them, since they are only declared as input variables).
 Basically this algorithm contains simple assignments and conditions, which eventually lead to unreachable code when combined, only.
-As described at \ref{code:basic example 1}, Basic-block 11 is not reachable, a consequence of the condition in line 15.
+As described at \ref{code:basic example 1}, basicblock 11 is not reachable, a consequence of the condition in line 15.
 Even tough a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
 The idea of the implementation originated from this example.
 
+
+
+Metrics:
+\begin{itemize}
+	\item Runtime: 581ms
+	\item Number of analyzed instruction blocks: 17
+	\item Violation: block 11
+\end{itemize}
+
+% 581ms
+% 17 Blöcke analysiert
+% Violation für block 11
 
 \begin{figure}[h!]
 	\begin{GenericCode}
@@ -33,19 +45,44 @@ The idea of the implementation originated from this example.
 			IF s_operationHour <> m_operationHour THEN
 				s_operationHour := m_operationHour;
 			END_IF;
-		END_IF;
-	\end{GenericCode}
+		END_IF;	\end{GenericCode}
 	\centering
-	\includegraphics[width=0.8\textwidth]{minimal-example}
-	\caption{A minimal example containing unreachable code due to unsatisfiable conditions. The condition in line 15 is never reachable, since this case was already handled in line 1 and the state of that variable did not change. Therefore BasicBlock 11 is not reachable.}
+
+	\includegraphics[width=0.9\textwidth]{minimal-example-cfg}
+	\caption{A minimal example containing unreachable code due to unsatisfiable conditions. The condition in line 15 is never reachable, since this case was already handled in line 1 and the state of that variable did not change. Therefore basic block 11 is not reachable.}
+	\label{code:basic example 1 cfg}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{minimal-example}
+	\caption{Analysis of example \ref{code:basic example 1 cfg}. }
 	\label{code:basic example 1}
 \end{figure}
 
-\section{Loops \textasciitilde 1 1/2 Site}
+\section{Loops}
 The main consequence of the implementation is significantly greater execution time, especially, when loops are present.
-The following examples contain an almost identical algorithm. The only difference is that the first \ref{code:loop example 1} has a set value for x, whereas \ref{code:loop example 2} does not have a limitation. Therefore BasicBlock 6 is not reachable in the first example, but may be reachable for the second.
-Note that the second example may not be correctly analyzed when the loop has to be executed too often. Loops will only be iterated over for a set amount of times, which is configurable. If a block will be visited more often, the analysis stops and no violation will be reported.
-Loops slow the analysis down significantly. 
+The following examples contain an almost identical algorithm. The only difference is that the first \ref{code:loop example 1 cfg} has a set value for x, whereas \ref{code:loop example 2 cfg} does not have a limitation. Therefore basic block 6 is not reachable in the first example \ref{code:loop example 1}, but may be reachable for the second \ref{code:loop example 2}.
+Interestingly 
+
+
+Metrics (Example 1):
+\begin{itemize}
+	\item Runtime: 61ms
+	\item Number of analyzed instruction blocks: 20
+	\item Violation: block 6
+\end{itemize}
+
+
+
+Metrics (Example 2):
+\begin{itemize}
+	\item Runtime: <1ms
+	\item Number of analyzed instruction blocks: 68
+	\item Violation: none
+\end{itemize}
+
+
 \begin{figure}[h!]
 	\begin{GenericCode}
 		i := 1;
@@ -57,11 +94,19 @@ Loops slow the analysis down significantly.
 		
 		IF i = 3 THEN
 			x := 4;
-		END_IF;	
-	\end{GenericCode}
+		END_IF;		\end{GenericCode}
 	\centering
-	\includegraphics[width=0.35\textwidth]{basicWhile}
-	\caption{The variable i will changes inside the loop. As long as x is not equal to 3, the Basic block 6 is unreachable. }
+	% 61ms
+	% 20
+	% Violation für block 6
+	\includegraphics[width=0.6\textwidth]{basic-while-cfg}
+	\caption{The variable i will changes inside the loop. As long as x is not equal to 3, the basic block 6 is unreachable. }
+	\label{code:loop example 1 cfg}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.6\textwidth]{basic-while}
+	\caption{Analysis of example \ref{code:loop example 1 cfg}. }
 	\label{code:loop example 1}
 \end{figure}
 \begin{figure}[h!]
@@ -74,17 +119,34 @@ Loops slow the analysis down significantly.
 		
 		IF i = 3 THEN
 			x := 4;
-		END_IF;	
-	\end{GenericCode}
+		END_IF;		\end{GenericCode}
 	\centering
-	\includegraphics[width=0.35\textwidth]{basicWhileInput}
+	% <1ms
+	% 68
+	% No violations
+	\includegraphics[width=0.6\textwidth]{basic-while-input-cfg}
 	\caption{Same as \ref{code:loop example 1}, but x is an input variable. Therefore it may be 3, so it could be reachable.}
+	\label{code:loop example 2 cfg}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{basic-while-input}
+	\caption{Analysis of example \ref{code:loop example 2 cfg}.}
 	\label{code:loop example 2}
 \end{figure}
-\section{Function- and Procedure-Calls \textasciitilde 3 Site}
-This example \ref{code:func test 1} demonstrates the handling of \emph{Function- and Procedure-calls}. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated Algorithm-Block). 
-As described in \ref{sub:handling procedure and function calls} only the declaration of the parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
+\section{Function- and Procedure-Calls}
+This example \ref{code:func test 1} demonstrates the handling of function- and procedure-calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
+As described in \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
 Due to this circumstances Basic-block 5 and 9 are not reachable.
+
+
+Metrics:
+\begin{itemize}
+	\item Runtime: 169ms
+	\item Number of analyzed instruction blocks: 31
+	\item Violation: block 5
+\end{itemize}
+
 
 \begin{figure}[h!]
 	\begin{GenericCode}
@@ -111,24 +173,42 @@ Due to this circumstances Basic-block 5 and 9 are not reachable.
 	ABFunc.algo1(out1 => tmp1, in1 := tmp2, in_out1 := tmp3);
 
 	IF tmp2 = 3 THEN
-		tmp2 := 3; // Unreachable - since tmp2 does not have to be 3!
-	END_IF;
-
-	\end{GenericCode}
+		tmp2 := 3; // Reachable
+	END_IF;	\end{GenericCode}
 	\centering
-	\includegraphics[width=0.25\textwidth]{easyFuncTest}
-	\caption{Demonstrates Intraprocedural analysis. The procedure \emph{FooOutput} declares the first parameter as an IN parameter and therefore has no effect on the variable, while the other two parameters are declared as OUT parameters and might change. Note that the analysis does not check if the out parameter will be mutated, so it will be counted as if it would have. ABFunc is an instantiated Algorithm-Block, which is similar to a class, and declares the parameters of the procedure \emph{algo1} in the same order. Note that the second occurrence of this method call contains named parameters. \emph{out1} and \emph{in\_out3} may be mutated.}
+	% 169ms
+	% 31 
+	% Violations 5
+	\caption{Demonstrates intraprocedural analysis. The procedure  FooOutput declares the first parameter as an IN parameter and therefore has no effect on the variable, while the other two parameters are declared as OUT parameters and might change. Note that the analysis does not check if the out parameter will be mutated, so it will be counted as if it would have. ABFunc is an instantiated algorithm block, which is similar to a class, and declares the parameters of the procedure \emph{algo1} in the same order. Note that the second occurrence of this method call contains named parameters. \emph{out1} and \emph{in\_out3} may be mutated.}
 	\label{code:func test 1}
 \end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{easy-func-test-cfg}
+	\caption{Control flow graph of example \ref{code:func test 1}}
+	\label{fig:func test 1 cfg}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{easy-func-test}
+	\caption{Analysis of example \ref{fig:func test 1 cfg}.}
+	\label{fig:func test 1}
+\end{figure}
 
-
-\section{Hard Example \textasciitilde 3 Site}
+\section{Hard Example}
 This example \ref{code:hard example 1} was found in the literature \cite{Click_1995} and it was stated, that the usual method for finding unreachable code is not able to detect this instance. 
 Since the implementation is different at its core, it was only natural to test and compare the results.
 Since no other functions were injected for this analysis, in contrast to the method described in \ref{cha:state of the art}, this instance will be found and reported.
 Note that the loop contains a variable which does not change, which will never stop. Therefore the analysis would stop early and no violation would be reported without the correct configuration. 
 If the condition would have been different, it is easier to detect, but since this example has been used by different sources it was not altered.
 
+
+Metrics:
+\begin{itemize}
+	\item Runtime: 20ms
+	\item Number of analyzed instruction blocks: 47
+	\item Violation: block 4
+\end{itemize}
 
 \begin{figure}[h!]
 	\begin{GenericCode}
@@ -140,13 +220,20 @@ If the condition would have been different, it is easier to detect, but since th
 			x := 2;
 		END_IF;    
 	UNTIL pred
-	END_REPEAT;
-	\end{GenericCode}
+	END_REPEAT;	\end{GenericCode}
+	% 20ms
+	% 47
+	% Violation Block 4
 	\centering
-	\includegraphics[width=0.15\textwidth]{hardExample}
-	\caption{As described in \ref{code:ssa-defect} this procedure can not be analyzed correctly and will not report, that Basic-block 4 is unreachable. }
+	\includegraphics[width=0.4\textwidth]{hard-example-cfg}
+	\caption{As described in \ref{code:ssa-defect} this procedure can not be analyzed correctly and will not report, that basic block 4 is unreachable. }
+	\label{code:hard example 1 cfg}
+\end{figure}
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{hard-example}
+	\caption{Analysis of example \ref{code:hard example 1 cfg}.}
 	\label{code:hard example 1}
 \end{figure}
-
 
 
