@@ -7,13 +7,11 @@ Each example provides the code, the control flow graph, a description and some m
 
 
 \section{Basic Example}
-This example \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even tough there are procedure calls, they can not change them, since they are only declared as input variables).
+This example in figure \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even though there are procedure calls, they cannot change them, since they are only declared as input variables).
 Basically this algorithm contains simple assignments and conditions, which eventually lead to unreachable code when combined, only.
-As described at \ref{code:basic example 1}, basicblock 11 is not reachable, a consequence of the condition in line 15.
+As described at figure \ref{code:basic example 1}, basicblock 11 is not reachable, a consequence of the condition in line 15.
 Even tough a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
 The idea of the implementation originated from this example.
-
-
 
 Metrics:
 \begin{itemize}
@@ -62,8 +60,7 @@ Metrics:
 
 \section{Loops}
 The main consequence of the implementation is significantly greater execution time, especially, when loops are present.
-The following examples contain an almost identical algorithm. The only difference is that the first \ref{code:loop example 1 cfg} has a set value for x, whereas \ref{code:loop example 2 cfg} does not have a limitation. Therefore basic block 6 is not reachable in the first example \ref{code:loop example 1}, but may be reachable for the second \ref{code:loop example 2}.
-Interestingly 
+The following examples contain an almost identical algorithm. The only difference is that the first example in figure \ref{code:loop example 1 cfg} has a set value for x, whereas the example in figure \ref{code:loop example 2 cfg} does not have a limitation. Therefore basic block 6 is not reachable in the first example in figure \ref{code:loop example 1}, but may be reachable for the second example in figure \ref{code:loop example 2}.
 
 
 Metrics (Example 1):
@@ -135,9 +132,9 @@ Metrics (Example 2):
 	\label{code:loop example 2}
 \end{figure}
 \section{Function- and Procedure-Calls}
-This example \ref{code:func test 1} demonstrates the handling of function- and procedure-calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
-As described in \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
-Due to this circumstances Basic-block 5 and 9 are not reachable.
+This example in figure \ref{code:func test 1} demonstrates the handling of function- and procedure-calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
+As described in section \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
+Due to this circumstances basic block 5 and 9 are not reachable.
 
 
 Metrics:
@@ -196,9 +193,9 @@ Metrics:
 \end{figure}
 
 \section{Hard Example}
-This example \ref{code:hard example 1} was found in the literature \cite{Click_1995} and it was stated, that the usual method for finding unreachable code is not able to detect this instance. 
+This example in figure \ref{code:hard example 1} was found in the literature \cite{Click_1995} and it was stated, that the usual method for finding unreachable code is not able to detect this instance. 
 Since the implementation is different at its core, it was only natural to test and compare the results.
-Since no other functions were injected for this analysis, in contrast to the method described in \ref{cha:state of the art}, this instance will be found and reported.
+Since no other functions were injected for this analysis, in contrast to the method described in chapter \ref{cha:state of the art}, this instance will be found and reported.
 Note that the loop contains a variable which does not change, which will never stop. Therefore the analysis would stop early and no violation would be reported without the correct configuration. 
 If the condition would have been different, it is easier to detect, but since this example has been used by different sources it was not altered.
 
