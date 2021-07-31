@@ -4,13 +4,178 @@
 \label{cha:state of the art}
 % kurzfassung über das kapitel
 
-\section{Java-compiler}
+
+\section{Syntactic Analysis}
+
+Detects only one form of unreachable code (syntactic analysis --> only statements) and does not check the broader context and therefore no infeasible code may be found.
+
+\subsection{Java-compiler}
 \label{sec:java compiler}
+% Javac also used by IDEs. 
 
-\section{Internal static code analysis of IntelliJ}
+The Java-compiler (javac) performs checks regarding unreachable code and strictly results in a compile time error. 
+In the official documentation \cite{Chapter14Blocks} unreachable code is defined as follows:
+\begin{quote}
+\label{quote:java unreachable definition}
+This section is devoted to a precise explanation of the word "reachable." 
+The idea is that there must be some possible execution path from the beginning of the constructor, method, instance initializer, or static initializer that contains the statement to the statement itself. The analysis takes into account the structure of statements. Except for the special treatment of while, do, and for statements whose condition expression has the constant value true, the values of expressions are not taken into account in the flow analysis.
+\end{quote}
+
+Since values are not considered during this analysis, it is impossible to detect infeasible code as described in figure Figure \ref{code:java infeasible undetected}.
+ Loops are the exception here, but only conditions containing literal boolean values will be checked and may result in a compile time error as demonstrated by figure \ref{code:java loop unreachable}. The rationale behind not considering the values of variables and even constants is to use them as flags (see figure \ref{code:java flags}).
+
+
+Unexpected return statements turn the following statements unreachable. As shown in figure \ref{code:java unexpected return} and mentioned before, conditions of if-then-else blocks are not evaluated, even if they contain only (boolean) literals. But again this does not apply to loops.
+
+
+Unexpected break statements turn the following statements within the current scope of the loop unreachable as shown in figure \ref{code:java unexpected break}.
+
+
+\begin{figure}[h!]
+	\begin{JavaCode}
+void testUnreachableWhile() {
+	int x = 3;
+	while(false || false && true) x = 10; // compile time error
+}
+
+void testUnreachableWhileNoError() {
+	int x = 3;
+	while(false || false && true || x == 4) x = 10; // No error
+}
+
+void testUnreachableWhileBoolean() {
+	int x = 3;
+	boolean y = false;
+	while(false || false && true || y) x = 10; // No error
+}\end{JavaCode}
+	\caption{The Java compiler evaluates conditions of loops, if, and only if, they contain literal boolean values only. Even tough the second method is definitly unreachable, no error will be reported. The same applies to the third method. Even tough the value is always the same, no error will be reported.}
+	\label{code:java loop unreachable}
+\end{figure}
+
+\begin{figure}[h!]
+	\begin{JavaCode}
+void testSimpleIf() {
+	int x = 3;
+	if(false) x = 10; // No error
+}\end{JavaCode}
+	\caption{Simple if-then-else statements do not evaluate the condition at all in contrast to loops seen in figure \ref{code:java loop unreachable}.}
+	\label{code:java infeasible undetected}
+\end{figure}
+
+\begin{figure}[h!]
+	\begin{JavaCode}
+void testFlag() {
+	int x = 3;
+	final boolean DEBUG = false;
+	if(DEBUG) x = 10; // No error
+}\end{JavaCode}
+	\caption{The rationale behind not even considering constant values is the usage of flags.}
+	\label{code:java flags}
+\end{figure}
+
+\begin{figure}[h!]
+	\begin{JavaCode}
+void testSystemExit() {
+	System.exit(0);
+	System.out.println("This code is unreachable"); // no error - System.exit is not handled like a return statement
+}
+
+void testAlwaysReturn() {
+	if(true) return;
+	System.out.println("This code is unreachable"); // no error - condition is not checked
+}
+
+void testReturn() {
+	return;
+	int i = 3; // Compilation error - unreachable statement
+}
+
+void testReturnInAllBranches() {
+	boolean x = true;
+	if(x) return;
+	else return;
+	System.out.println("Unreachable code!"); // Compilation error - unreachable statement
+}
+
+void testReturnInWhile() {
+	while(true) {
+		return;
+	}
+	int i = 34; // Compilation error - unreachable statement
+}\end{JavaCode}
+	\caption{Examples of unreachable code due to unexpected return statements. Interestingly System.exit(), a statement that does terminate the program, is not handled like a return statement. As stated before, conditions of if-then-else blocks are not evaluated and therefore do not report an error, but conditions in loops are the exception again. }
+	\label{code:java unexpected return}
+\end{figure}
+
+\begin{figure}[h!]
+	\begin{JavaCode}
+void testBreak() {
+	while(true) {
+		int i = 3;
+		break; // Compilation error - unreachable statement
+		i++;
+	}
+}
+
+void testBreak2() {
+	while(true) {
+		int i = 3;
+		if(true) break; // no error - condition is not checked
+		i++;
+	}
+}\end{JavaCode}
+	\caption{Examples of unreachable code due to unexpected break statements.}
+	\label{code:java unexpected break}
+\end{figure}
+
+Regarding unreachable code the java compiler performs a Dataflow analysis. The Liveness of each statement will be analyzed by the "AliveAnalyzer" class in Flow.java. The implemented AST-Model makes use of the Visitor pattern. During analysis each node will be visited and checked according to definition \ref{quote:java unreachable definition}.
+
+
+\section{Graph based Analysis}
+% AST -> CFG -> SSA -> Constant prop -> bedingungen prüfen
+% Kontext sensitiv -> more precise
+
+
+\subsection{Internal static code analysis of IntelliJ}
 \label{sec:intelliJ}
+% ? evtl doch tool von paper.
 
-\section{Joogie}
+
+
+
+\section{Prover assisted Analysis}
+
+
+
+
+\subsection{Joogie}
 \label{sec:sca paper}
 
-\cite{arltJoogieInfeasibleCode2012} \& \cite{arltJoogieJavaJimple2013}
+Joogie \cite{arltJoogieInfeasibleCode2012, arltJoogieJavaJimple2013} identifies infeasible code of any Java-project using a verification system. 
+At first the source code will be transformed into a 3-address intermediate representation of java-bytecode using the Soot framework. Consequently only 15 kinds of statements are considered. 
+
+Afterwards the java-bytecode is transformed into the Boogie language, which is an imperative intermediate verification language for analyzing high level programming languages.
+During the translation the memory model has to be preserved. The heap is represented by a two dimensional array. The first index refers to the object's address and the second to the field of the object.
+
+Loops are unwinded into 3 unwindings: the first and last iteration, as well as an abstract unwinding of the rest.
+The result is a program containing no loops.
+
+
+Methods are checked in an intraprocedural manner. Therefore variables that may change become non-deterministic. 
+
+
+Afterwards the Boogie program will be called by the verifier. 
+The foundation of the verifier is the SMT-solver Z3.
+
+
+
+When infeasible code is encountered, the Java-bytecode will be transformed back into Java and a violation will be reported.
+
+
+This tool was tested on 4 bigger open source software projects including ArgoUML, TerpWord, Rachota and Freemind, and only few false warnings were reported.
+The time needed for analysis was tolerable, since usually only small code fragements have to be analyzed instead of the whole project.
+
+
+
+% maybe herausnehmen (?)
+Besides greater runtime other problems were encountered in conditional branching in else-if statements and false warnings in finally clauses.
