@@ -2,18 +2,30 @@
 
 \chapter{State of the Art \textasciitilde 10 sites}
 \label{cha:state of the art}
-% kurzfassung über das kapitel
+
+Analysing and refactoring code is a central part of software development. Naturally this process can be automated to some degree using various static code analysis tools. 
+Some of these tools are applied at different stages during development ranging from compiler to static code analysis in the cloud.
+In this chapter multiple static code analysis tools will be presented, ranging in quality for detecting bugs (with a focus on unreachable code).
+The accuracy for finding unreachable code increases with each tool presented. 
+The examples are provided in the Java language beginning with the java compiler itself, which verifies the correctness and validity of written source code before compilation. 
+The java compiler also includes a linter, which does not do any additional checks regarding unreachable code. 
 
 
-\section{Syntactic Analysis}
+On of the most important tools a programmer uses is arguably the Integrated Development Environment (IDE), which usually includes a code inspector for preventing bugs as the code is written. 
+The most popular Java IDEs have been Eclipse \cite{incCommunityOpenInnovation} and IntelliJ \cite{IntelliJIDEACapable}. 
+Possibly both may be improved by installing additional plugins for checking code.
 
-Detects only one form of unreachable code (syntactic analysis --> only statements) and does not check the broader context and therefore no infeasible code may be found.
 
-\subsection{Java-compiler}
+Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud and usually part of a continous integration pipeline. It offers a wide variety of checks including a more in depth unreachable code analysis.
+
+
+Some instances of unreachable code may not be found using the tools before. For a more advanced approach statements have to be evaluated. Infeasible path conditions may be found using a mathematical prover or SMT-Solver.
+
+\section{Java Compiler}
 \label{sec:java compiler}
 % Javac also used by IDEs. 
 
-The Java-compiler (javac) performs checks regarding unreachable code and strictly results in a compile time error. 
+The java compiler (javac) performs checks regarding unreachable code and strictly results in a compile time error. 
 In the official documentation \cite{Chapter14Blocks} unreachable code is defined as follows:
 \begin{quote}
 \label{quote:java unreachable definition}
@@ -77,12 +89,12 @@ void testFlag() {
 	\begin{JavaCode}
 void testSystemExit() {
 	System.exit(0);
-	System.out.println("This code is unreachable"); // no error - System.exit is not handled like a return statement
+	int x = 0; // no error - System.exit is not handled like a return statement
 }
 
 void testAlwaysReturn() {
 	if(true) return;
-	System.out.println("This code is unreachable"); // no error - condition is not checked
+	int x = 0; // no error - condition is not checked
 }
 
 void testReturn() {
@@ -94,7 +106,7 @@ void testReturnInAllBranches() {
 	boolean x = true;
 	if(x) return;
 	else return;
-	System.out.println("Unreachable code!"); // Compilation error - unreachable statement
+	x = false; // Compilation error - unreachable statement
 }
 
 void testReturnInWhile() {
@@ -112,16 +124,16 @@ void testReturnInWhile() {
 void testBreak() {
 	while(true) {
 		int i = 3;
-		break; // Compilation error - unreachable statement
-		i++;
+		break; 
+		i++; // Compilation error - unreachable statement
 	}
 }
 
 void testBreak2() {
 	while(true) {
 		int i = 3;
-		if(true) break; // no error - condition is not checked
-		i++;
+		if(true) break; 
+		i++; // no error - condition is not checked
 	}
 }\end{JavaCode}
 	\caption{Examples of unreachable code due to unexpected break statements.}
@@ -131,24 +143,152 @@ void testBreak2() {
 Regarding unreachable code the java compiler performs a Dataflow analysis. The Liveness of each statement will be analyzed by the "AliveAnalyzer" class in Flow.java. The implemented AST-Model makes use of the Visitor pattern. During analysis each node will be visited and checked according to definition \ref{quote:java unreachable definition}.
 
 
-\section{Graph based Analysis}
-% AST -> CFG -> SSA -> Constant prop -> bedingungen prüfen
-% Kontext sensitiv -> more precise
 
-
-\subsection{Internal static code analysis of IntelliJ}
+\section{Integrated Development Environments}
 \label{sec:intelliJ}
-% ? evtl doch tool von paper.
+Integrated Development Environments (IDE) are used by almost every Software Developer daily and an integral tool for creating correct and safe code.
+In comparison to simple text editors IDEs only support a few select Programming Languages. Generally they provide better support and usually do contain some sort of static code analysis to assist a developer writing good code. 
+Depending on the IDE the static code analysis can be configured to be more or less strict. 
+When the IDE contains an extensive plugin system then custom analysis tools may be used for a possibly even more precise methods to find potential bugs.
 
 
+Regarding unreachable code the following IDEs were analyzed:
+\begin{itemize}
+	% TODO Add citation for eclipse
+	\item \emph{Eclipse} \cite{incCommunityOpenInnovation}is an IDE primarily focused on developing Java projects. A basic, configurable inspection tool is integrated. Additional to the checks by the java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in figure \ref{code:java eclipse intelij always true or false}. Generally the inspector is very basic regarding unreachabe code detection. As shown in figure \ref{code:java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g. Integer) are also taken into account. Besides that eclipse is extensible and many additional tools for more sophisticated analysis exist.
+	\item \emph{IntelliJ Idea} \cite{IntelliJIDEACapable} is an IDE used for developing projects in various popular programming languages (e.g. Java, C\#, Python, JavaScript, etc.). For the Java language a code inspector can be configured to find different categories of errors. By default two important rules are activated to deliver warnings: 
+	\begin{itemize}
+		\item \emph{Constant conditional expressions}, which do not only check for boolean literals in conditions, but also take values of variables, in case they always have the same value, and even other datatypes (e.g. Integer) into account as shown in figure \ref{code:java eclipse intelij always true or false}
+		\item \emph{Duplicate Condition} that have already been checked. Even tough this may sometimes be intended, in most cases they are overlooked or may even not be reached, when the method terminates in the branch followed by the former condition as shown in figure \ref{code:java intelij duplicate conditions}. 
+	\end{itemize}
+	IntelliJ also provides a plugin system and therefore the possibility integrating an even better analysis is given.
+\end{itemize}
+
+% Beispiele für eclipse + IntelliJ
+
+\begin{figure}[h!]
+	\begin{JavaCode}
+void testAlwaysTrueCondition() {
+	if(true) return; // Warning: Condition is always true
+	int i = 3;
+}
+
+void testAlwaysFalse() {
+	boolean x = true;
+	boolean y = false;
+	if(x && y) int i = 3; // Warning: Condition is always false
+}
+
+void testUnreachableWhile() {
+	int x = 3;
+	while(x > 4) x = 10; // Warning: Condition is always false
+}\end{JavaCode}
+	\caption{Internal code inspection tools of the IDEs \emph{Eclipse} and \emph{IntelliJ Idea} are capable of detecting conditions, which always evaluate to true or false.}
+	\label{code:java eclipse intelij always true or false}
+\end{figure}
+
+\begin{figure}
+	\begin{JavaCode}
+void testCondAlreadyChecked(boolean x) {
+	int y = 0;
+	if(x) {
+		y = 3;
+	} else if(x) { // Condition already checked before
+		y = 4;
+	}
+	y++;
+}\end{JavaCode}
+\caption{Eclipse does not even check for duplicate conditions within the same if/else-if block. In contrast IntelliJ does find this issue.}
+\label{code:java eclipse fail to find this}
+\end{figure}
+
+\begin{figure}
+	\begin{JavaCode}
+void duplicateConditions(int s_operationHour, int m_operationHour) {
+	if(s_operationHour != m_operationHour) { // Warning: Duplicate condition
+		m_operationHour = s_operationHour;
+		if (s_operationHour == 0) {
+			foo();        
+		}
+		return;
+	}
+	if(s_operationHour == 0) {
+		m_operationHour = 0;
+	} else {
+		// Unreachable, since the condition was checked already and returned
+		if(s_operationHour != m_operationHour) { // Warning: Duplicate condition
+			s_operationHour = m_operationHour;
+		}
+	}
+}\end{JavaCode}
+	\caption{Even tough these warnings do not hint to the unreachable code directly, they show a code smell prone to errors. In this particular case the else branch of the second if-then-else block cannot be reached, since the method already returned. In case one of the variables used in the second said condition, this error would not occur! Removing the return statement in line 7 removes this type of problem, but the second condition would always evaluate to false. }
+	\label{code:java intelij duplicate conditions}
+\end{figure}
+
+\section{Sonarqube \& Sonarlint} % Could be interessting since it is very strict and performs more advanced analysis
+\emph{Sonarqube} \cite{sonarqube} and \emph{Sonarlint} \cite{SonarLintFixIssues} are products created by \emph{Sonarsource} \cite{CodeQualityCode}. Sonarqube is a static code analysis solution used in conjunction with a build server.
+Commonly this analysis is either triggered after pushing commits, scheduled at certain times of the day or a combination of both.
+Sonarqube supports a multitude of programming languages ranging from Java to Python and even COBOL. Another languages may be supported in form of a plugin.
 
 
-\section{Prover assisted Analysis}
+Sonarlint is available for some IDEs (including Eclipse and IntelliJ) in form of a plugin to provide immediate feedback. Note that this plugin only covers a subset of functionalities of sonarqube, but still provides better support than many internal inspectors built into IDEs.
 
 
+Using the same example as before (seen in figure \ref{code:java intelij duplicate conditions}) sonarqube detectes that this expression always evaluates to false, which is provides better information than the internal code inspector of IntelliJ, as demonstrated in figure \ref{code:java sonarqube duplicate conditions}.
 
+\begin{figure}
+	\begin{JavaCode}
+		void duplicateConditions(int s_operationHour, int m_operationHour) {
+			if(s_operationHour != m_operationHour) {
+				m_operationHour = s_operationHour;
+				if (s_operationHour == 0) {
+					foo();        
+				}
+				return;
+			}
+			if(s_operationHour == 0) {
+				m_operationHour = 0;
+			} else {
+				if(s_operationHour != m_operationHour) { // SonarLint: Change this Condition so it does not always evaluate false
+					s_operationHour = m_operationHour;
+				}
+			}
+	}\end{JavaCode}
+	\caption{The same example as seen in \ref{code:java intelij duplicate conditions}, but sonarqube reports the problem correctly. }
+	\label{code:java sonarqube duplicate conditions}
+\end{figure}
 
-\subsection{Joogie}
+\begin{figure}
+	\begin{JavaCode}
+void testLoop(boolean pred) {
+	int x = 1;
+	do {
+		boolean b = x != 1;
+		// b can never be true, this will possibly result in an infinite loop.
+		if(b) {
+			pred = false;
+		}
+	} while(pred);
+}
+
+void testDeadCode() {
+	int i, j;
+	i = 3;
+	for(j = 1; j < i; ++j) {
+		// ...
+	}
+	// i must be equal to j
+	if(i != j) { 
+		// ...
+	}
+}\end{JavaCode}
+	\caption{Neither the internal code inspector nor sonarlint/-qube were able to catch these errors. }
+	\label{code:java sonarqube hard example}
+\end{figure}
+
+The example shown in figure \ref{code:java sonarqube hard example} cannot be detected. It appears that mutation in loops are not evaluated and will therefore not deliver any error. This type of error may only be detected by evaluating each statement.
+
+\section{Joogie}
 \label{sec:sca paper}
 
 Joogie \cite{arltJoogieInfeasibleCode2012, arltJoogieJavaJimple2013} identifies infeasible code of any Java-project using a verification system. 
@@ -175,7 +315,3 @@ When infeasible code is encountered, the Java-bytecode will be transformed back 
 This tool was tested on 4 bigger open source software projects including ArgoUML, TerpWord, Rachota and Freemind, and only few false warnings were reported.
 The time needed for analysis was tolerable, since usually only small code fragements have to be analyzed instead of the whole project.
 
-
-
-% maybe herausnehmen (?)
-Besides greater runtime other problems were encountered in conditional branching in else-if statements and false warnings in finally clauses.
