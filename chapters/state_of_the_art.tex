@@ -19,7 +19,7 @@ Possibly both may be improved by installing additional plugins for checking code
 Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud and usually part of a continous integration pipeline. It offers a wide variety of checks including a more in depth unreachable code analysis.
 
 
-Some instances of unreachable code may not be found using the tools before. For a more advanced approach statements have to be evaluated. Infeasible path conditions may be found using a mathematical prover or SMT-Solver.
+Some instances of unreachable code may not be found using the tools before. For a more advanced approach statements have to be evaluated. Infeasible path conditions may be found by using a mathematical prover or SMT-Solver.
 
 \section{Java Compiler}
 \label{sec:java compiler}
@@ -154,7 +154,6 @@ When the IDE contains an extensive plugin system then custom analysis tools may 
 
 Regarding unreachable code the following IDEs were analyzed:
 \begin{itemize}
-	% TODO Add citation for eclipse
 	\item \emph{Eclipse} \cite{incCommunityOpenInnovation}is an IDE primarily focused on developing Java projects. A basic, configurable inspection tool is integrated. Additional to the checks by the java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in figure \ref{code:java eclipse intelij always true or false}. Generally the inspector is very basic regarding unreachabe code detection. As shown in figure \ref{code:java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g. Integer) are also taken into account. Besides that eclipse is extensible and many additional tools for more sophisticated analysis exist.
 	\item \emph{IntelliJ Idea} \cite{IntelliJIDEACapable} is an IDE used for developing projects in various popular programming languages (e.g. Java, C\#, Python, JavaScript, etc.). For the Java language a code inspector can be configured to find different categories of errors. By default two important rules are activated to deliver warnings: 
 	\begin{itemize}
@@ -226,6 +225,7 @@ void duplicateConditions(int s_operationHour, int m_operationHour) {
 \end{figure}
 
 \section{Sonarqube \& Sonarlint} % Could be interessting since it is very strict and performs more advanced analysis
+\label{sec:sonar}
 \emph{Sonarqube} \cite{sonarqube} and \emph{Sonarlint} \cite{SonarLintFixIssues} are products created by \emph{Sonarsource} \cite{CodeQualityCode}. Sonarqube is a static code analysis solution used in conjunction with a build server.
 Commonly this analysis is either triggered after pushing commits, scheduled at certain times of the day or a combination of both.
 Sonarqube supports a multitude of programming languages ranging from Java to Python and even COBOL. Another languages may be supported in form of a plugin.
@@ -254,7 +254,7 @@ Using the same example as before (seen in figure \ref{code:java intelij duplicat
 				}
 			}
 	}\end{JavaCode}
-	\caption{The same example as seen in \ref{code:java intelij duplicate conditions}, but sonarqube reports the problem correctly. }
+	\caption{The same example as seen in figure \ref{code:java intelij duplicate conditions}, but sonarqube reports the problem correctly. }
 	\label{code:java sonarqube duplicate conditions}
 \end{figure}
 
@@ -290,7 +290,7 @@ The example shown in figure \ref{code:java sonarqube hard example} cannot be det
 
 \section{Joogie}
 \label{sec:sca paper}
-
+% TODO: Verbessern und Beispiele hinzufügen
 Joogie \cite{arltJoogieInfeasibleCode2012, arltJoogieJavaJimple2013} identifies infeasible code of any Java-project using a verification system. 
 At first the source code will be transformed into a 3-address intermediate representation of java-bytecode using the Soot framework. Consequently only 15 kinds of statements are considered. 
 
@@ -298,7 +298,7 @@ Afterwards the java-bytecode is transformed into the Boogie language, which is a
 During the translation the memory model has to be preserved. The heap is represented by a two dimensional array. The first index refers to the object's address and the second to the field of the object.
 
 Loops are unwinded into 3 unwindings: the first and last iteration, as well as an abstract unwinding of the rest.
-The result is a program containing no loops.
+The result is a program containing no loops. Every Assignment inside the loop replaces the value into non-determined values. Therefore loops are not fully evaluated.
 
 
 Methods are checked in an intraprocedural manner. Therefore variables that may change become non-deterministic. 
@@ -314,4 +314,6 @@ When infeasible code is encountered, the Java-bytecode will be transformed back 
 
 This tool was tested on 4 bigger open source software projects including ArgoUML, TerpWord, Rachota and Freemind, and only few false warnings were reported.
 The time needed for analysis was tolerable, since usually only small code fragements have to be analyzed instead of the whole project.
+
+This tool is as capable as sonarqube \ref{sec:sonar} in finding unreachable code.
 
