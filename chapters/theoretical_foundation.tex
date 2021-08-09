@@ -4,31 +4,227 @@
 \label {cha:theoretical foundation}
 % Einleitung schreiben
 
-\section{Unreachable Code \textasciitilde 1 site}
-\emph{Unreachable Code} specifies a piece of source-code within a function, which can not be executed due to no feasible path.
-There are two categories of unreachable code:
+\section{Definitions \textasciitilde 1 site}
+\label{sec:definitions}
+% \emph{Unreachable Code} specifies a piece of source-code within a function, which can not be executed due to no feasible path.
+% There are two categories of unreachable code:
+%\begin{itemize}
+%	\item No path to the given piece of source-code exists, which is created by unconditional jumps, even tough other instructions would follow. 
+%	Many compilers already check for this type of error.
+%	\item Infeasible path conditions are the more common type found in programs and harder to detect. The complete environment has to be known during analysis (state of variables) and be taken into account. 
+%\end{itemize}
+
+% Fixing this type of error may be hard, since it indicates faulty logic created by accident. 
+The definition of unreachable code is rather complicated and confusing. 
+Similar terms like dead code and infeasible code are often tossed around and the definition appears to differ in many standards. 
+Sometimes the terms are used as aliases for each other.
+
+
+In the following sections each term will be defined.
+
+\subsection{Unreachable Code \textasciitilde 1/3 site}
+\label{sub:unreachable code}
+Unreachable code is source code, which can never be reached (during execution). 
+The causes may either be due to:
+\begin{enumerate}
+	\item imperative statements that force a unconditional jump (even tough there are statements following) as shown in figure \ref{code:unconditional unreachable code}. Depending on language, these statements are: 
+	\begin{itemize}
+		\item break
+		\item return
+		\item goto
+	\end{itemize}
+	\item infeasible conditions as described in section \ref{sub:infeasible code}. 
+\end{enumerate}
+
+
+\begin{figure}
+	\begin{CppCode}
+int unreachable_code_goto() {
+	int x = 42;
+	goto end;
+	x = 43; // unreachable
+	end: return x;
+}
+
+int unreachable_code_return() {
+	int x = 42;
+	return x;
+	x = 43; // unreachable
+}
+
+int unreachable_code_break() {
+	int x = 42;
+	while(true) {
+		break;
+		x = 43; // unreachable
+	}
+	return x;
+}
+
+int unreachable_code_exception(int x) {
+	if(x != 42) {
+		throw "X is not 42";
+		x = 42; // unreachable
+	}
+	return x;
+}
+
+int checked_conditions(int x) {
+	if(x == 42) {
+		return 42;
+	} else if(x == 42) { // This condtion was checked already => unreachable
+		return 42;
+	}
+	return x;
+}\end{CppCode}
+	\caption{This example written in C++ demonstrates unreachable code due to unconditional jumps. When conditions were already checked within the same if-then-else block they are also considered unreachable.}
+	\label{code:unconditional unreachable code}
+\end{figure}
+
+
+\subsection{Dead Code \textasciitilde 1/3 site}
+\label{sub:dead code}
+%emph{Dead Code} is that part of the source-code, which may be reachable, is not used any further. It is sometimes also referred to \emph{Unused Code}
+%(e.g. variables, classes or functions and methods, but also files \cite{Boomsma_2012}).
+%\emph{Dead Code} and \emph{Unreachable Code} are often confused. Some standards even describe \emph{Unreachable Code} as a subset of \emph{Dead Code} \cite{CWECWE561Dead}.
+%Declaring \emph{Unreachable Code} as \emph{Dead Code} is debatable, since \emph{Unreachable Code} is dead basically. The \emph{dead} part in this case would be an \emph{Instruction Block} within the \emph{Control-flow Graph}.
+%Removing \emph{Dead Code} is an easier task compared to other forms of defects since the unused part may simply be deleted.
+
+Dead code is code, which may be reachable, but is not used any further.
+The most common types of dead code is unused code:
 \begin{itemize}
-	\item No path to the given piece of source-code exists, which is created by unconditional jumps, even tough other instructions would follow. 
-	Many compilers already check for this type of error.
-	\item Infeasible path conditions are the more common type found in programs and harder to detect. The complete environment has to be known during analysis (state of variables) and be taken into account. 
+	\item Unused variables \cite{Prahofer_2012}
+	\item Unused methods/functions \cite{Romano_2016}
+	\item Unused classes
+	\item Unused files \cite{Boomsma_2012}
+	\item ...
 \end{itemize}
+In figure \ref{code:dead code} some of these errors are presented. As presented, unnecessary assignments are also considered dead code.
 
-Fixing this type of error may be hard, since it indicates faulty logic created by accident. 
 
-\subsection{Difference to Dead Code \textasciitilde 1/3 site}
-\emph{Dead Code} is that part of the source-code, which may be reachable, is not used any further. It is sometimes also referred to \emph{Unused Code}
-(e.g. variables, classes or functions and methods, but also files \cite{Boomsma_2012}).
-\emph{Dead Code} and \emph{Unreachable Code} are often confused. Some standards even describe \emph{Unreachable Code} as a subset of \emph{Dead Code} \cite{CWECWE561Dead}.
-Declaring \emph{Unreachable Code} as \emph{Dead Code} is debatable, since \emph{Unreachable Code} is dead basically. The \emph{dead} part in this case would be an \emph{Instruction Block} within the \emph{Control-flow Graph}.
-Removing \emph{Dead Code} is an easier task compared to other forms of defects since the unused part may simply be deleted.
-\subsection{Difference to Unnecessary Code \textasciitilde 1/3 site}
-\emph{Unnecessary Code} describes source-code, in which no stake holder has interest in. This may either be by accidental re-implementations of a feature or changes of interest of feature implementations, which have not been deleted\cite{Haas_2020}.
+The term \emph{dead} implies that the counterpart called \emph{live} exists. 
+The \emph{Liveness} of an expression indicates, if it has any impact on the program when executed.
+Dead code is usually a sign of an unnecessary baggage and should be deleted, which is often easy since it is not used anyways.
+When dead code is not deleted and more and more instances of dead code are accumulated, it will become harder to maintain and comprehend \cite{Romano_2020}. Dead code may be intended in foresight of extensiblility. But when this extensibility is no longer intended, the already implemented mechanisms may include dead code. This code must be refactored or removed, otherwise it results in worse maintainability and 
+Source code written in object oriented programming languages do contain significantly more dead code according to the research paper \cite{Srivastava_1992}.
+
+
+It is important to note, that according to this definition dead code may be reachable, but does not have to be.
+
+% \cite{Romano_2016}
+% \cite{Boomsma_2012}
+
+% Unused statements, methods, variables (?)
+
+\begin{figure}
+	\begin{JavaCode}
+public class DeadCode {
+	public static int unusedVariable() {
+		int i = 1; // Unused variable
+		int j = 3;
+		int x = 3 + j;
+		return x;
+	}
+			
+	public static int unnecessaryAssignment() {
+		int x;
+		x = 4; // Unnecessary Assignment
+		x = 3;
+		return x;
+	}
+			
+	private static class UnusedClass {
+		// This class is not used (and cannot be accessed from outside this class)
+	}
+			
+	private static void unusedMethod() {
+		// This method is not used (and cannot be accessed from outside this class)
+	}
+}\end{JavaCode}
+	\caption{Some instances of dead code written in Java. The unnecessary assignment in line 11 does not have any effect. In case the file containing the class DeadCode is not used it would be considered as a dead file.}
+	\label{code:dead code}
+\end{figure}
+
+\subsubsection{Is Unreachable Code Dead Code?}
+% Pro / Contra
+Dead code and unreachable code are often used synonymously. 
+Some standards, like MITRE-CWE \cite{CWECWE561Dead} define dead code as follows:
+\begin{quote}
+	Dead code is source code that can never be executed in a running program. The surrounding code makes it impossible for a section of code to ever be executed.
+\end{quote}
+This definition does not have anything in common with the one provided before. According to this standard, dead code is unreachable code, since it cannot be executed. But unnecessary assignments are not considered dead code, but has its own category \emph{Assignment to Variable without Use}.
+Both of this issues are considered as \emph{Irrelevant Code}.
+
+
+In contrast the standard MISRA-C \cite{motorindustrysoftwarereliabilityassociationMISRAC2004Guidelines2008} defines unreachable code as follows:
+\begin{quote}
+Rule 14.1 (required): There shall be no unreachable code.
+This  rule  refers  to  code  which  cannot  under  any  circumstances  be  reached,  and  which  can  be 
+identified as such at compile time. Code that can be reached but may never be executed is excluded 
+from the rule (e.g. defensive programming code).	
+\end{quote}
+Semantically both definitions are the same. The only difference is the naming.
+
+
+The similarity between unreachable code and dead code is, that both do not have an effect on a running program. But dead code (as described in this document) may be reachable, but is just unnecessary, especially when executed. 
+
+
+As mentioned before the sources of these two error types are different.
+Dead code occurs for example, when intended extensibility or features are no longer required and are not deleted or refactored.
+Unreachable code, especially infeasible code, occurs due to faulty logic and may not as straightforward to fix.
+\subsection{Infeasible Code \textasciitilde 1/3 site}
+\label{sub:infeasible code}
+
+Infeasible code only occurs due to conditions which always evaluate to false. Another reason could be confusion around expressions \cite{Eichberg_2015}.
+
+
+Infeasible code may occur either due to conditions which only consist of boolean literals (and expressions), constants, or as consequence of former conditions, as demonstrated in figure \ref{code:infeasible code}.
+
+Infeasible code is a subset of unreachable code.
+\begin{figure}
+	\begin{JavaCode}
+public class InfeasibleCode {
+	public static void infeasibleConstant() {
+		if(false) {
+			// always false
+			// ...
+		}
+	}
+			
+	public static void alwaysInfeasibleVariable() {
+		boolean x = false;
+		if(x) {
+			// always false
+			// ...
+		}
+	}
+			
+	public static void infeasibleConditions(int x) {
+		if(x > 10) {
+			if(x < 10) {
+				// always false
+				// ...
+			}
+		}
+	}
+}\end{JavaCode}
+	\caption{Infeasible code is determined by conditions which always result with false. }
+	\label{code:infeasible code}
+\end{figure}
+
+
+% \cite{Eichberg_2015}
+% \cite{Arlt_2013}
+% \cite{arltJoogieInfeasibleCode2012}
+% \cite{arltJoogieJavaJimple2013}
+% Nur bedingungen
 
 
 \section{Kemro-IEC 61131-3 \textasciitilde 3 sites}
+\label{sec:iec}
 % TODO: Sprachfeatures beschreiben
 % https://webstore.iec.ch/preview/info_iec61131-3%7Bed3.0%7Db.pdf -> sind actually min 2 sprachen
-\emph{IEC 61131-3} is a standard which specifies syntax and semantics for programmable controllers. 
+% \emph{IEC 61131-3} is a standard which specifies syntax and semantics for programmable controllers. 
 % Keine Dynamische Allokierung --> Alles vor Laufzeit
 % Kein Polymorphismus
 % Predictable Schedule
@@ -41,50 +237,53 @@ Removing \emph{Dead Code} is an easier task compared to other forms of defects s
 % Pointer Arithmetik
 % 
  
-\section{Abstract Syntax Tree \textasciitilde 1 site}
+% \section{Abstract Syntax Tree \textasciitilde 1 site}
 % Aufbau
 % Unterschied zu normalem syntax tree
 % 
-\section{Controlflow Graph \textasciitilde 1 sites}
+% \section{Controlflow Graph \textasciitilde 1 sites}
 % Instruction Blocks
 % Kanten
 % Instructions
 % Verwendungszwecke
-\section{Single Static Assignment Form \textasciitilde 1 sites}
+% \section{Single Static Assignment Form \textasciitilde 1 sites}
 % Representation der Instruktionen, Variablen, etc.
 % Phi Funktion
 % Vorteile
 % Verwendungszweck
-
-\section{Constant Propagation \textasciitilde 1 sites}
+% \section{Constant Propagation \textasciitilde 1 sites}
 % 
-\section{Types of procedural Analysis}
+% \section{Types of procedural Analysis}
 % Procedures are evaluated either \emph{Inter-} or \emph{Intra-proecedural}. 
 
-During analysis of \emph{Functions} or \emph{Procedures} the calling of other \emph{Functions} and \emph{Procedures} may be taken into account to enable more detailed information of programs.
+%During analysis of \emph{Functions} or \emph{Procedures} the calling of other \emph{Functions} and \emph{Procedures} may be taken into account to %enable more detailed information of programs.
 
 
-\begin{itemize}
-	\item \emph{Intraprocedural Analysis} does not take \emph{Function-}/Procedure-calls into account. 
-	\item \emph{Interprocedural Analysis} takes \emph{Function-}/Procedure-calls and their concrete return values into account.
-\end{itemize}
+%\begin{itemize}
+%	\item \emph{Intraprocedural Analysis} does not take \emph{Function-}/Procedure-calls into account. 
+%	\item \emph{Interprocedural Analysis} takes \emph{Function-}/Procedure-calls and their concrete return values into account.
+%\end{itemize}
 
 
 \section{Satisfiable Modulo Theory \textasciitilde 3 sites}
+% SMT-Solver generally extend SAT-Solvers by the addition of arithmetic
+
+
+% Verwendungszwecke
 % Geschichte
 % SAT-Solver
-% Verwendungszwecke
+
 \subsection{Satisfiability Prover \textasciitilde 1 site}
 % Übersicht verschiedener Implementierungen
 % Standardisierung erwähnen (SMT-Lib2)
 \subsection{SMT-LIB \textasciitilde 1 sites}
-SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
-By using the same input and output format SMT-Solvers may be exchanged at any time. 
-This format is LISP-like and shares the same characteristics and being a functional programming language. 
-For example mutations are not permitted and there is no possiblity of using traditional loops (which may be replaced by recursion).
-Usually a SMT-LIB programm begins with declaring functions. Variables are also represented as functions. 
-Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
-The last part contains an instruction for the SMT-Solver to check the satisfiability. 
-Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
-SMT-Solvers may also implement the simplification of a given expression.
+%SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
+%By using the same input and output format SMT-Solvers may be exchanged at any time. 
+%This format is LISP-like and shares the same characteristics and being a functional programming language. 
+%For example mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
+%Usually a SMT-LIB programm begins with declaring functions. Variables are also represented as functions. 
+%Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
+%The last part contains an instruction for the SMT-Solver to check the satisfiability. 
+%Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
+%SMT-Solvers may also implement the simplification of a given expression.
 % SMT-Lib2 (LISP) präsentieren
