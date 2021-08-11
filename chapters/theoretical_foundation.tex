@@ -266,24 +266,33 @@ public class InfeasibleCode {
 
 
 \section{Satisfiable Modulo Theory \textasciitilde 3 sites}
-% SMT-Solver generally extend SAT-Solvers by the addition of arithmetic
+\begin{quote}
+	Satisfiability modulo theories (SMT) generalizes boolean satisfiability (SAT) by
+	adding equality reasoning, arithmetic, fixed-size bit-vectors, arrays, quantifiers,
+	and other useful first-order theories. An SMT solver is a tool for deciding the satisfiability (or dually the validity) of formulas in these theories. SMT solvers enable
+	applications such as extended static checking, predicate abstraction, test case generation, and bounded model checking over infinite domains, to mention a few. \cite{demouraZ3EfficientSMT2008}
+\end{quote}
 
+The basis of a SMT-Solver is a SAT-Solver, which solves boolean formulas only. SMT-Solvers may function as a separate program or may be imported as a module/package into a program. 
+Popular SMT-Solvers are for example Z3 \cite{demouraZ3EfficientSMT2008}, Princess \cite{princess08}, Yices2 \cite{Dutertre:cav2014} and many more.
 
-% Verwendungszwecke
-% Geschichte
-% SAT-Solver
-
-\subsection{Satisfiability Prover \textasciitilde 1 site}
-% Übersicht verschiedener Implementierungen
-% Standardisierung erwähnen (SMT-Lib2)
 \subsection{SMT-LIB \textasciitilde 1 sites}
-%SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
-%By using the same input and output format SMT-Solvers may be exchanged at any time. 
-%This format is LISP-like and shares the same characteristics and being a functional programming language. 
-%For example mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
-%Usually a SMT-LIB programm begins with declaring functions. Variables are also represented as functions. 
-%Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
-%The last part contains an instruction for the SMT-Solver to check the satisfiability. 
-%Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
-%SMT-Solvers may also implement the simplification of a given expression.
-% SMT-Lib2 (LISP) präsentieren
+SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
+By using the same input and output format SMT-Solvers may be exchanged at any time. 
+This format is a LISP, which has some additional special functions used for direct interaction with the SMT-Solver. Since LISP is a functional programming language, the same characteristics are applied to SMT-Lib.
+For example mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
+Usually a SMT-LIB programm (see figure \ref{code:smt-lib}) begins with declaring functions. Variables may also be represented as functions. 
+Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
+The last part contains an instruction for the SMT-Solver to check the satisfiability. 
+Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
+SMT-Solvers may also implement the simplification of a given expression.
+
+\begin{figure}
+	\begin{GenericCode}
+	\end{GenericCode}
+	\caption{SMT-Lib example program.}
+	\label{code:smt-lib}
+\end{figure}
+
+
+
