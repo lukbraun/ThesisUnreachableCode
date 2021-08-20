@@ -3,7 +3,7 @@
 \chapter{State of the Art \textasciitilde 10 sites}
 \label{cha:state of the art}
 
-Analysing and refactoring code is a central part of software development. Naturally this process can be automated to some degree using various static code analysis tools. 
+Analyzing and refactoring code is a central part of software development. Naturally this process can be automated to some degree using various static code analysis tools. 
 Some of these tools are applied at different stages during development ranging from compiler to static code analysis in the cloud.
 In this chapter multiple static code analysis tools will be presented, ranging in quality for detecting bugs (with a focus on unreachable code).
 The accuracy for finding unreachable code increases with each tool presented. 
@@ -33,17 +33,17 @@ This section is devoted to a precise explanation of the word "reachable."
 The idea is that there must be some possible execution path from the beginning of the constructor, method, instance initializer, or static initializer that contains the statement to the statement itself. The analysis takes into account the structure of statements. Except for the special treatment of while, do, and for statements whose condition expression has the constant value true, the values of expressions are not taken into account in the flow analysis.
 \end{quote}
 
-Since values are not considered during this analysis, it is impossible to detect infeasible code as described in figure  \ref{code:Java infeasible undetected}.
- Loops are the exception here, but only conditions containing literal boolean values will be checked and may result in a compile time error as demonstrated by figure \ref{code:Java loop unreachable}. The rationale behind not considering the values of variables and even constants is to use them as flags (see figure \ref{code:Java flags}).
+Since values are not considered during this analysis, it is impossible to detect infeasible code as described in Listing \ref{code:Java infeasible undetected}.
+ Loops are the exception here, but only conditions containing literal boolean values will be checked and may result in a compile time error as demonstrated by Listing \ref{code:Java loop unreachable}. The rationale behind not considering the values of variables and even constants is to use them as flags (see Listing \ref{code:Java flags}).
 
 
-Unexpected return statements turn the following statements unreachable. As shown in figure \ref{code:Java unexpected return} and mentioned before, conditions of if-then-else blocks are not evaluated, even if they contain only (boolean) literals. But again this does not apply to loops.
+Unexpected return statements turn the following statements unreachable. As shown in Listing \ref{code:Java unexpected return} and mentioned before, conditions of if-then-else blocks are not evaluated, even if they contain only (boolean) literals. But again this does not apply to loops.
 
 
-Unexpected break statements turn the following statements within the current scope of the loop unreachable as shown in figure \ref{code:Java unexpected break}.
+Unexpected break statements turn the following statements within the current scope of the loop unreachable as shown in Listing \ref{code:Java unexpected break}.
 
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{JavaCode}
 void testUnreachableWhile() {
 	int x = 3;
@@ -62,9 +62,9 @@ void testUnreachableWhileBoolean() {
 }\end{JavaCode}
 	\caption{The Java compiler evaluates conditions of loops, if, and only if, they contain literal boolean values only. Even tough the second method is definitly unreachable, no error will be reported. The same applies to the third method. Even tough the value is always the same, no error will be reported.}
 	\label{code:Java loop unreachable}
-\end{figure}
+\end{program}
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{JavaCode}
 void testSimpleIf() {
 	int x = 3;
@@ -72,9 +72,9 @@ void testSimpleIf() {
 }\end{JavaCode}
 	\caption{Simple if-then-else statements do not evaluate the condition at all in contrast to loops seen in figure \ref{code:Java loop unreachable}.}
 	\label{code:Java infeasible undetected}
-\end{figure}
+\end{program}
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{JavaCode}
 void testFlag() {
 	int x = 3;
@@ -83,9 +83,9 @@ void testFlag() {
 }\end{JavaCode}
 	\caption{The rationale behind not even considering constant values is the usage of flags.}
 	\label{code:Java flags}
-\end{figure}
+\end{program}
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{JavaCode}
 void testSystemExit() {
 	System.exit(0);
@@ -117,9 +117,9 @@ void testReturnInWhile() {
 }\end{JavaCode}
 	\caption{Examples of unreachable code due to unexpected return statements. Interestingly System.exit(), a statement that does terminate the program, is not handled like a return statement. As stated before, conditions of if-then-else blocks are not evaluated and therefore do not report an error, but conditions in loops are the exception again. }
 	\label{code:Java unexpected return}
-\end{figure}
+\end{program}
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{JavaCode}
 void testBreak() {
 	while(true) {
@@ -138,7 +138,7 @@ void testBreak2() {
 }\end{JavaCode}
 	\caption{Examples of unreachable code due to unexpected break statements.}
 	\label{code:Java unexpected break}
-\end{figure}
+\end{program}
 
 Regarding unreachable code the Java compiler performs a data flow analysis. The liveness of each statement will be analyzed by the "AliveAnalyzer" class in Flow.Java. The implemented AST-model makes use of the visitor pattern \cite{gammaDesignPatternsElements}. During analysis each node will be visited and checked according to definition \ref{quote:Java unreachable definition}.
 
@@ -148,24 +148,24 @@ Regarding unreachable code the Java compiler performs a data flow analysis. The 
 \label{sec:intelliJ}
 Integrated Development Environments (IDE) are used by almost every software developer daily and an integral tool for creating correct and safe code.
 In comparison to simple text editors IDEs only support a few select programming languages. Generally they provide better support and usually do contain some sort of static code analysis to assist a developer writing good code. 
-Depending on the IDE the static code analysis can be configured to be more or less strict. 
+Depending on the IDE, static code analysis can be configured to be more or less strict. 
 When the IDE contains an extensive plugin system then custom analysis tools may be used for a possibly even more precise method to find potential bugs.
 
 
 Regarding unreachable code the following IDEs were analyzed:
 \begin{itemize}
-	\item \emph{Eclipse} \cite{incCommunityOpenInnovation} is an IDE primarily focused on developing Java projects. A basic, configurable inspection tool is integrated. Additional to the checks by the Java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in figure \ref{code:Java eclipse intelij always true or false}. Generally the inspector is very basic regarding unreachabe code detection. As shown in figure \ref{code:Java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g. Integer) are also taken into account. Besides that Eclipse is extensible and many additional tools for more sophisticated analysis exist.
+	\item \emph{Eclipse} \cite{incCommunityOpenInnovation} is an IDE primarily focused on developing Java projects. A basic, configurable inspection tool is integrated. Additional to the checks by the Java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in Listing \ref{code:Java eclipse intelij always true or false}. Generally the inspector is very basic regarding unreachabe code detection. As shown in Listing \ref{code:Java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g. Integer) are also taken into account. Besides that Eclipse is extensible and many additional tools for more sophisticated analysis exist.
 	\item \emph{IntelliJ Idea} \cite{IntelliJIDEACapable} is an IDE used for developing projects in various popular programming languages (e.g. Java, C\#, Python, JavaScript, etc.). For the Java language a code inspector can be configured to find different categories of errors. By default two important rules are activated to deliver warnings: 
 	\begin{itemize}
-		\item \emph{Constant conditional expressions}, which do not only check for boolean literals in conditions, but also take values of variables, in case they always have the same value, and even other datatypes (e.g. Integer) into account as shown in figure \ref{code:Java eclipse intelij always true or false}
-		\item \emph{Duplicate Condition} that have already been checked. Even tough this may sometimes be intended, in most cases they are overlooked or may even not be reached, when the method terminates in the branch followed by the former condition as shown in figure \ref{code:Java intelij duplicate conditions}. 
+		\item \emph{Constant conditional expressions}, which do not only check for boolean literals in conditions, but also take values of variables, in case they always have the same value, and even other datatypes (e.g. Integer) into account as shown in Listing \ref{code:Java eclipse intelij always true or false}
+		\item \emph{Duplicate Condition} that have already been checked. Even tough this may sometimes be intended, in most cases they are overlooked or may even not be reached, when the method terminates in the branch followed by the former condition as shown in Listing \ref{code:Java intelij duplicate conditions}. 
 	\end{itemize}
 	IntelliJ also provides a plugin system and therefore the possibility integrating an even better analysis is given.
 \end{itemize}
 
 % Beispiele für eclipse + IntelliJ
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{JavaCode}
 void testAlwaysTrueCondition() {
 	if(true) return; // Warning: Condition is always true
@@ -184,9 +184,9 @@ void testUnreachableWhile() {
 }\end{JavaCode}
 	\caption{Internal code inspection tools of the IDEs \emph{Eclipse} and \emph{IntelliJ Idea} are capable of detecting conditions, which always evaluate to true or false.}
 	\label{code:Java eclipse intelij always true or false}
-\end{figure}
+\end{program}
 
-\begin{figure}
+\begin{program}
 	\begin{JavaCode}
 void testCondAlreadyChecked(boolean x) {
 	int y = 0;
@@ -199,9 +199,9 @@ void testCondAlreadyChecked(boolean x) {
 }\end{JavaCode}
 \caption{Eclipse does not even check for duplicate conditions within the same if/else-if block. In contrast IntelliJ does find this issue.}
 \label{code:Java eclipse fail to find this}
-\end{figure}
+\end{program}
 
-\begin{figure}
+\begin{program}
 	\begin{JavaCode}
 void duplicateConditions(int s_operationHour, int m_operationHour) {
 	if(s_operationHour != m_operationHour) { // Warning: Duplicate condition
@@ -222,7 +222,7 @@ void duplicateConditions(int s_operationHour, int m_operationHour) {
 }\end{JavaCode}
 	\caption{Even tough these warnings do not hint to the unreachable code directly, they show a code smell prone to errors. In this particular case the else branch of the second if-then-else block cannot be reached, since the method already returned. In case one of the variables used in the second said condition, this error would not occur! Removing the return statement in line 7 removes this type of problem, but the second condition would always evaluate to false. }
 	\label{code:Java intelij duplicate conditions}
-\end{figure}
+\end{program}
 
 \section{Sonarqube \& Sonarlint} % Could be interessting since it is very strict and performs more advanced analysis
 \label{sec:sonar}
@@ -234,31 +234,31 @@ Sonarqube supports a multitude of programming languages ranging from Java to Pyt
 Sonarlint is available for some IDEs (including Eclipse and IntelliJ) in form of a plugin to provide immediate feedback. Note that this plugin only covers a subset of functionalities of sonarqube, but still provides better support than many internal inspectors built into IDEs.
 
 
-Using the same example as before (seen in figure \ref{code:Java intelij duplicate conditions}) Sonarqube detectes that this expression always evaluates to false, which provides better information than the internal code inspector of IntelliJ, as demonstrated in figure \ref{code:Java sonarqube duplicate conditions}.
+Using the same example as before (seen in Listing \ref{code:Java intelij duplicate conditions}) Sonarqube detectes that this expression always evaluates to false, which provides better information than the internal code inspector of IntelliJ, as demonstrated in Listing \ref{code:Java sonarqube duplicate conditions}.
 
-\begin{figure}
+\begin{program}
 	\begin{JavaCode}
-		void duplicateConditions(int s_operationHour, int m_operationHour) {
-			if(s_operationHour != m_operationHour) {
-				m_operationHour = s_operationHour;
-				if (s_operationHour == 0) {
-					foo();        
-				}
-				return;
-			}
-			if(s_operationHour == 0) {
-				m_operationHour = 0;
-			} else {
-				if(s_operationHour != m_operationHour) { // SonarLint: Change this Condition so it does not always evaluate false
-					s_operationHour = m_operationHour;
-				}
-			}
-	}\end{JavaCode}
-	\caption{The same example as seen in figure \ref{code:Java intelij duplicate conditions}, but sonarqube reports the problem correctly. }
+void duplicateConditions(int s_operationHour, int m_operationHour) {
+	if(s_operationHour != m_operationHour) {
+		m_operationHour = s_operationHour;
+		if (s_operationHour == 0) {
+			foo();        
+		}
+		return;
+	}
+	if(s_operationHour == 0) {
+		m_operationHour = 0;
+	} else {
+		if(s_operationHour != m_operationHour) { // SonarLint: Change this Condition so it does not always evaluate false
+			s_operationHour = m_operationHour;
+		}
+	}
+}\end{JavaCode}
+	\caption{The same example as seen in Listing \ref{code:Java intelij duplicate conditions}, but sonarqube reports the problem correctly. }
 	\label{code:Java sonarqube duplicate conditions}
-\end{figure}
+\end{program}
 
-\begin{figure}
+\begin{program}
 	\begin{JavaCode}
 void testLoop(boolean pred) {
 	int x = 1;
@@ -284,9 +284,9 @@ void testDeadCode() {
 }\end{JavaCode}
 	\caption{Neither the internal code inspector nor sonarlint/-qube were able to catch these errors. }
 	\label{code:Java sonarqube hard example}
-\end{figure}
+\end{program}
 
-The example shown in figure \ref{code:Java sonarqube hard example} cannot be detected. It appears that mutation in loops are not evaluated and will therefore not deliver any error. This type of error may only be detected by evaluating each statement.
+The example shown in Listing \ref{code:Java sonarqube hard example} cannot be detected. It appears that mutation in loops are not evaluated and will therefore not deliver any error. This type of error may only be detected by evaluating each statement.
 
 \section{Joogie}
 \label{sec:sca paper}

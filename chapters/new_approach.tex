@@ -35,14 +35,14 @@ The detection of unreachable code will be implemented in form of a rule as seen 
 Afterwards the instructions within the control flow graph will be transformed as described in Section \ref{subsec:translate instructions}.
 The analysis is covered in Section \ref{sec:analysis}.
 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{static-code-analysis}
 	\caption{Architectural overview of the static code analysis tool for IEC source code. After parsing IEC source code the AST will be passed to the RuleExecutor, which triggers only the configured rules. For more advanced analysis the AST may be transformed into a different representation. When the source code does not conform to the rules violations will be generated, which can be integrated with Sonarqube.}
 	\label{fig:general architecture}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{unreachable-architecture-overview}
 	\caption{General overview of the implementation of the unreachable code detection rule. Each step is annotated in which section it is described. }
@@ -62,27 +62,27 @@ Two separate procedures will be performed on this control flow graph.
 	\item \emph{Unreachable code due to infeasible conditions} needs a sophisticated and more expensive (in terms of computing resources) approach to identify. The following Section \ref{sec:analysis} describes how to detect them.
 \end{enumerate}
 
-\begin{program}[h!]
+\begin{program}
 	\begin{GenericCode}
-		$x$ $\leftarrow$ 3
-		$y$ $\leftarrow$ 0
+$x$ $\leftarrow$ 3
+$y$ $\leftarrow$ 0
 		
-		if $x$ > 2 then
-			$y$ $\leftarrow$ $x$ + 1
-		else
-			$y$ $\leftarrow$ $x$ - 1
-		end
+if $x$ > 2 then
+	$y$ $\leftarrow$ $x$ + 1
+else
+	$y$ $\leftarrow$ $x$ - 1
+end
 		
-		while $y$ < $x$ + 10 do
-			$y$ $\leftarrow$ $y$ + 1
-		end
+while $y$ < $x$ + 10 do
+	$y$ $\leftarrow$ $y$ + 1
+end
 		
-		log($\downarrow$ $x$)\end{GenericCode}
+log($\downarrow$ $x$)\end{GenericCode}
 	\caption{Example containing assignments, branches, loops and procedure-calls. }
 	\label{code:transformation example}
 \end{program}
 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{ast-to-cfg}
 	\caption{In the first step the abstract syntax tree of a function in listing \ref{code:transformation example} will be translated into the control flow graph.}
@@ -105,13 +105,13 @@ Instructions come in three different types (shown in figure \ref{fig:state}) and
 	\item \emph{Procedure calls} may be mutable and could change variables, if they are applied as \emph{output parameters}. % Procedure calls will be dissolved into \emph{assignments} during analysis.
 	For intraprocedural analysis of procedures, output parameters will be dissolved into assignments to simplify the process. Basically it is assumed that out parameters get an undetermined value assigned, which consequently update the state of the variable and may contain any possible value (restricted only by the datatype).
 \end{enumerate}
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.85\textwidth]{State}
 	\caption{Each instruction in any program may be either represented as an \emph{Assignment}, \emph{Condition} or \emph{ProcedureCall} which encapsulates the expression of types described in Figure \ref{fig:smtobject}. Instructions are processed into a \emph{BaseObject} during evaluation. \emph{Conditions} and \emph{ProcedureCalls} simply contain the expression, whereas \emph{Assignments} separate the left side (the receiving variable) and its concrete value on the right side.}
 	\label{fig:state}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{cfg-to-internal}
 	\caption{The instructions contained in the control flow graph (created before as described in Figure \ref{fig:ast to cfg}) change their representation into a simpler form. As demonstrated in Figure \ref{fig:state} all instructions are either assignments, conditions or procedure calls. Furthermore the concrete instructions are also represented simpler as described in Figure \ref{fig:smtobject}. }
@@ -122,7 +122,7 @@ Instructions come in three different types (shown in figure \ref{fig:state}) and
 Every Instruction will also be represented in an AST-like notation as shown in Figure \ref{fig:smtobject}. Each symbol, for example a variable, name of a function or any given literal (such as numbers and strings), are represented as an \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure calls, but also operations (like + and -). User-defined functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since named parameters are a language feature of IEC and therefore must be handled correctly), which will be represented as \emph{BaseObjects}. 
 This kind of representation makes it easy to work with, since it is a very easy, tree-like data structure which may be traversed easily. Not only replacing variables and values may be done effortlessly, but also the generation of \emph{SMT-Lib} code, since this representation is similar to \emph{LISP}.
 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.2\textwidth]{SMTObject}
 	\caption{\emph{AST}-like representation of instructions. }
@@ -135,70 +135,70 @@ For each instruction block the instructions will be evaluated. The resulting sta
 For the determination, if the current state is feasible or not, the SMT-solver Z3 \cite{demouraZ3EfficientSMT2008} is used. The state will be simply translated into the universal, standardized, LISP-like SMT-Lib language \ref{code:translation} which most of the common SMT-solvers are able to interpret. 
 If an instruction block is reachable (at least on one occasion) it will be marked as reachable. At the end of the analysis all remaining instruction blocks are marked unreachable.
 
-\begin{program}[h!]
+\begin{program}
 	\begin{GenericCode}
-	procedure $mergeState$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
-		if $instruction.isCondition()$ then
-			$state.add($$\downarrow$ $instruction$$)$
-		else if $instruction.isAssignment()$ then
-			// replace all occurences of variables with their concrete values
-			// from the provided $states$ variable
-			$replaceVariables($$\updownarrow$ $instruction$, $\downarrow$ $state$$)$ 
-			// remove old state e.g. former Assignments and Conditions, which are not
-			// valid anymore
-			$removeAllOccurrences($$\updownarrow$ $state$, $\downarrow$ $instruction$$)$
-			// add the new instruction to the state
-			$state.add($$\downarrow$ $instruction$$)$
-		end 
-	end		
+procedure $mergeState$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
+	if $instruction.isCondition()$ then
+		$state.add($$\downarrow$ $instruction$$)$
+	else if $instruction.isAssignment()$ then
+		// replace all occurences of variables with their concrete values
+		// from the provided $states$ variable
+		$replaceVariables($$\updownarrow$ $instruction$, $\downarrow$ $state$$)$ 
+		// remove old state e.g. former Assignments and Conditions, which are not
+		// valid anymore
+		$removeAllOccurrences($$\updownarrow$ $state$, $\downarrow$ $instruction$$)$
+		// add the new instruction to the state
+		$state.add($$\downarrow$ $instruction$$)$
+	end 
+end		
 	\end{GenericCode}
 	\caption{Merges the new instruction into the existing state. While conditions simply may be added, assignments alter the state, since the concrete value changes and former state can no longer be associated with this variable. }
 \label{code:merge state}
 \end{program}
-\begin{program}[h!]
+\begin{program}
 	\begin{GenericCode}
-	function $solve$($\downarrow$ $state$) begin
-		// translate state to SMT-String and pass to Z3
-		return $Z3.solve($$\downarrow$ $state.toSMTString())$
-	end
+function $solve$($\downarrow$ $state$) begin
+	// translate state to SMT-String and pass to Z3
+	return $Z3.solve($$\downarrow$ $state.toSMTString())$
+end
 	\end{GenericCode}
 	\caption{The form (see figure \ref{fig:smtobject}) all instructions are represented in makes the generation of SMTLib code easy. The string containing SMTLib code will simply be passed to the solver directly.}
 \label{code:z3 solver}
 \end{program}
-\begin{program}[h!]
+\begin{program}
 	\begin{GenericCode}
-	procedure $resolveFunctionCalls$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
-		// intra-procedural aprroach:
-		// simply remove all variables, which may change.
-		$outParams$ $\leftarrow$ $instructions.getOutParams()$
-		$state.removeState($$\downarrow$ $outParams$$)$
-	end		
+procedure $resolveFunctionCalls$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
+	// intra-procedural aprroach:
+	// simply remove all variables, which may change.
+	$outParams$ $\leftarrow$ $instructions.getOutParams()$
+	$state.removeState($$\downarrow$ $outParams$$)$
+end		
 	\end{GenericCode}
 	\caption{Function calls will be handled in an intra-procedural manner. This is simply realized by just removing any state containing a variable which may change and will be handled like an assignment, whereas the new value is unknown. }
 	\label{code:intraprocedural analysis}
 \end{program}
-\begin{program}[h!]
+\begin{program}
 	\begin{GenericCode}
-	procedure $analyze$ ($\downarrow$ $instructionBlock$, $\downarrow$ $oldState$) begin
-		$newState$ $\leftarrow$ $oldState$
-		$instructions$ $\leftarrow$ $instructionBlock.getInstructions()$
-		$feasible$ $\leftarrow$ $solve(\downarrow oldState)$
+procedure $analyze$ ($\downarrow$ $instructionBlock$, $\downarrow$ $oldState$) begin
+	$newState$ $\leftarrow$ $oldState$
+	$instructions$ $\leftarrow$ $instructionBlock.getInstructions()$
+	$feasible$ $\leftarrow$ $solve(\downarrow oldState)$
 		
-		if $feasible$ then
-			// This instruction block is marked as visitable
-			$markInstructionBlock(\downarrow instructionBlock)$ 
-			for $instruction$ in $instructions$ do
-				$resolveFunctionCalls$($\downarrow$ $instruction$, $\updownarrow$ $newState$)	
-				if not $instruction.containsFunctionCall()$ then
-					// Functioncalls were already handled at this point
-					$mergeState$($\downarrow$ $instruction$, $\updownarrow$ $newState$)
-				end 
-			end
-			$analyze$($\downarrow$ $instructionBlock.getThenBranch()$, $\downarrow$ $newState$)
-			// By following the else-branches last instruction, if it was a condition, must be negated
-			$analyze$($\downarrow$ $instructionBlock.getElseBranch()$, $\downarrow$ $newState.negateLastInstruction()$)
+	if $feasible$ then
+		// This instruction block is marked as visitable
+		$markInstructionBlock(\downarrow instructionBlock)$ 
+		for $instruction$ in $instructions$ do
+			$resolveFunctionCalls$($\downarrow$ $instruction$, $\updownarrow$ $newState$)	
+			if not $instruction.containsFunctionCall()$ then
+				// Functioncalls were already handled at this point
+				$mergeState$($\downarrow$ $instruction$, $\updownarrow$ $newState$)
+			end 
 		end
-	end	
+		$analyze$($\downarrow$ $instructionBlock.getThenBranch()$, $\downarrow$ $newState$)
+		// By following the else-branches last instruction, if it was a condition, must be negated
+		$analyze$($\downarrow$ $instructionBlock.getElseBranch()$,$\downarrow$ $newState.negateLastInstruction()$)
+	end
+end	
 	\end{GenericCode}
 
 	\caption{The main component of the unreachable code detection is the analysis of instruction blocks. Beginning with no state set it will be added subsequently by traversing the control flow graph and adding accumulated state. 
@@ -208,29 +208,29 @@ If an instruction block is reachable (at least on one occasion) it will be marke
 \end{program}
 
 % TODO: add example for translation
-\begin{program}[h!]
+\begin{program}
 	\begin{GenericCode}
-		$i$ $\leftarrow$ 1
-		$x$ $\leftarrow$ 5
-		if $i$ < $x$ then 
-			// ...
-		end
+$i$ $\leftarrow$ 1
+$x$ $\leftarrow$ 5
+if $i$ < $x$ then 
+	// ...
+end
 	\end{GenericCode}
 	\begin{GenericCode}
-		;; Check if condition evaluates TRUE
-		(declare-fun x () Real)
-		(declare-fun i () Real)
-		(assert (and (= i 1) (= x 5) (< i x)))
-		(check-sat)
-		; => SAT
+;; Check if condition evaluates TRUE
+(declare-fun x () Real)
+(declare-fun i () Real)
+(assert (and (= i 1) (= x 5) (< i x)))
+(check-sat)
+; => SAT
 	\end{GenericCode}
 	\begin{GenericCode}
-		;; Check if condition evaluates FALSE	
-		(declare-fun x () Real)
-		(declare-fun i () Real)
-		(assert (and (= i 1) (= x 5) (not (< i x))))
-		(check-sat)
-		; => UNSAT
+;; Check if condition evaluates FALSE	
+(declare-fun x () Real)
+(declare-fun i () Real)
+(assert (and (= i 1) (= x 5) (not (< i x))))
+(check-sat)
+; => UNSAT
 	\end{GenericCode}
 	\caption{Translation of the IEC-Code. As shown above, each variable must be declared beforehand (therefore the implementation must be aware of the type). The assertion includes the complete state (including assignments and conditions). Conditions are the only part which could lead to an unfeasible result. Every Instruction-Block must contain at least one edge out of the block (with the exception of the exit block), but may also contain a second edge, indicating the path of a condition evaluates false. Therefore the condition must be negated.}
 	\label{code:translation}
@@ -271,11 +271,11 @@ This is the reason why so many branches will be created, which will have a negat
 
 The last example show in Figure \ref{fig:unconditionalJump} shows an example containing an unconditional jump in a loop. There are no incoming edges into BasicBlock 4, which indicates that these statements of this basic block are unreachable.
 
-\begin{figure}[!h]
+\begin{figure}
 	\begin{GenericCode}
-		$x$ $\leftarrow$ 1
-		$x$ $\leftarrow$ $x$ + 1
-		$i$ $\leftarrow$ $x$
+$x$ $\leftarrow$ 1
+$x$ $\leftarrow$ $x$ + 1
+$i$ $\leftarrow$ $x$
 	\end{GenericCode}
 	\centering
 	\includegraphics[width=0.3\textwidth]{assignments-only-cfg}
@@ -284,13 +284,13 @@ The last example show in Figure \ref{fig:unconditionalJump} shows an example con
 	\label{fig:assignmentOnly}
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}
 	\begin{GenericCode}
-		if $x$ = 2 then 
-			y $\leftarrow$ true
-		else
-			y $\leftarrow$ false
-		end
+if $x$ = 2 then 
+	y $\leftarrow$ true
+else
+	y $\leftarrow$ false
+end
 	\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{simple-if-cfg}
@@ -299,11 +299,11 @@ The last example show in Figure \ref{fig:unconditionalJump} shows an example con
 	\label{fig:simpleIf}	
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}
 	\begin{GenericCode}
-		for $i$ $\leftarrow$ 0..$x$ do
-			$y$ $\leftarrow$ $i$ + $x$
-		end		
+for $i$ $\leftarrow$ 0..$x$ do
+	$y$ $\leftarrow$ $i$ + $x$
+end		
 	\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{simple-loop-cfg}
@@ -312,14 +312,14 @@ The last example show in Figure \ref{fig:unconditionalJump} shows an example con
 	\label{fig:simpleLoop}
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}
 	\begin{GenericCode}
-		$i$ $\leftarrow$ 1
-		while $i$ < 10 do
-			$i$ $\leftarrow$ 2
-			break
-			$i$ $\leftarrow$ 3
-		end
+$i$ $\leftarrow$ 1
+while $i$ < 10 do
+	$i$ $\leftarrow$ 2
+	break
+	$i$ $\leftarrow$ 3
+end
 	\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{unconditional-jump-cfg}
