@@ -7,9 +7,9 @@ Each example provides the code, the control flow graph, a description and some m
 
 
 \section{Basic Example}
-This example in figure \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even though there are procedure calls, they cannot change them, since they are only declared as input variables).
+This example in Figure \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even though there are procedure calls, they cannot change them, since they are only declared as input variables).
 Basically this algorithm contains simple assignments and conditions, which eventually lead to unreachable code when combined, only.
-As described at figure \ref{code:basic example 1}, basicblock 11 is not reachable, a consequence of the condition in line 15.
+As described at Figure \ref{code:basic example 1}, basicblock 11 is not reachable, a consequence of the condition in line 15.
 Even tough a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
 The idea of the implementation originated from this example.
 
@@ -24,26 +24,26 @@ Metrics:
 % 17 Blöcke analysiert
 % Violation für block 11
 
-\begin{figure}[h!]
+\begin{figure}
 	\begin{GenericCode}
-		IF s_operationHour <> m_operationHour THEN
-			m_operationHour := s_operationHour;
-			IF s_operationHour = 0 THEN
-				RESET_ALARM(Name := er_service, SubID1 := m_iNumber);
-			END_IF;
-			RETURN;
-		END_IF;
-		// s_operationHour must be equal to m_operationHour
-		IF s_operationHour = 0 THEN
-			// unnecessary - already zero
-			m_operationHour := 0;
-			RESET_ALARM(Name := er_service, SubID1 := m_iNumber);
-		ELSE
-			// unreachable
-			IF s_operationHour <> m_operationHour THEN
-				s_operationHour := m_operationHour;
-			END_IF;
-		END_IF;	\end{GenericCode}
+IF s_operationHour <> m_operationHour THEN
+	m_operationHour := s_operationHour;
+	IF s_operationHour = 0 THEN
+		RESET_ALARM(Name := er_service, SubID1 := m_iNumber);
+	END_IF;
+	RETURN;
+END_IF;
+// s_operationHour must be equal to m_operationHour
+IF s_operationHour = 0 THEN
+	// unnecessary - already zero
+	m_operationHour := 0;
+	RESET_ALARM(Name := er_service, SubID1 := m_iNumber);
+ELSE
+	// unreachable
+	IF s_operationHour <> m_operationHour THEN
+		s_operationHour := m_operationHour;
+	END_IF;
+END_IF;	\end{GenericCode}
 	\centering
 
 	\includegraphics[width=0.9\textwidth]{minimal-example-cfg}
@@ -51,7 +51,7 @@ Metrics:
 	\label{code:basic example 1 cfg}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{minimal-example}
 	\caption{Analysis of example \ref{code:basic example 1 cfg}. }
@@ -80,18 +80,18 @@ Metrics (Example 2):
 \end{itemize}
 
 
-\begin{figure}[h!]
+\begin{figure}
 	\begin{GenericCode}
-		i := 1;
-		x := 5;
+i := 1;
+x := 5;
 		
-		WHILE i < x DO
-			i := i + 1;
-		END_WHILE;
+WHILE i < x DO
+	i := i + 1;
+END_WHILE;
 		
-		IF i = 3 THEN
-			x := 4;
-		END_IF;		\end{GenericCode}
+IF i = 3 THEN
+	x := 4;
+END_IF;	\end{GenericCode}
 	\centering
 	% 61ms
 	% 20
@@ -100,23 +100,23 @@ Metrics (Example 2):
 	\caption{The variable i will changes inside the loop. As long as x is not equal to 3, the basic block 6 is unreachable. }
 	\label{code:loop example 1 cfg}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.6\textwidth]{basic-while}
 	\caption{Analysis of example \ref{code:loop example 1 cfg}. }
 	\label{code:loop example 1}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}
 	\begin{GenericCode}
-		i := 1;
+i := 1;
 		
-		WHILE i < x DO
-			i := i + 1;
-		END_WHILE;
+WHILE i < x DO
+	i := i + 1;
+END_WHILE;
 		
-		IF i = 3 THEN
-			x := 4;
-		END_IF;		\end{GenericCode}
+IF i = 3 THEN
+	x := 4;
+END_IF;		\end{GenericCode}
 	\centering
 	% <1ms
 	% 68
@@ -125,14 +125,14 @@ Metrics (Example 2):
 	\caption{Same as \ref{code:loop example 1}, but x is an input variable. Therefore it may be 3, so it could be reachable.}
 	\label{code:loop example 2 cfg}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.8\textwidth]{basic-while-input}
 	\caption{Analysis of example \ref{code:loop example 2 cfg}.}
 	\label{code:loop example 2}
 \end{figure}
 \section{Function- and Procedure-Calls}
-This example in figure \ref{code:func test 1} demonstrates the handling of function- and procedure-calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
+This example in Listing \ref{code:func test 1} demonstrates the handling of function- and procedure-calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
 As described in section \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
 Due to this circumstances basic block 5 and 9 are not reachable.
 
@@ -145,47 +145,47 @@ Metrics:
 \end{itemize}
 
 
-\begin{figure}[h!]
+\begin{program}
 	\begin{GenericCode}
-	tmp1 := 1;
-	tmp2 := 2;
-	tmp3 := 3;
+tmp1 := 1;
+tmp2 := 2;
+tmp3 := 3;
 
-	FooOutput(tmp1, tmp2, tmp3);
+FooOutput(tmp1, tmp2, tmp3);
 
-	IF tmp2 <> 2 AND tmp3 <> 3 THEN
-		tmp2 := 2; // Reachable - could change
-	END_IF;
+IF tmp2 <> 2 AND tmp3 <> 3 THEN
+	tmp2 := 2; // Reachable - could change
+END_IF;
 
-	IF tmp1 <> 1 THEN
-		tmp2 := 3; // Unreachable
-	END_IF;
+IF tmp1 <> 1 THEN
+	tmp2 := 3; // Unreachable
+END_IF;
 
-	ABFunc.algo1(tmp2, tmp1, tmp3);
+ABFunc.algo1(tmp2, tmp1, tmp3);
 
-	IF tmp1 <> 1 AND tmp3 <> 1 THEN
-		tmp2 := 3; // Reachable
-	END_IF;
+IF tmp1 <> 1 AND tmp3 <> 1 THEN
+	tmp2 := 3; // Reachable
+END_IF;
 
-	ABFunc.algo1(out1 => tmp1, in1 := tmp2, in_out1 := tmp3);
+ABFunc.algo1(out1 => tmp1, in1 := tmp2, in_out1 := tmp3);
 
-	IF tmp2 = 3 THEN
-		tmp2 := 3; // Reachable
-	END_IF;	\end{GenericCode}
+IF tmp2 = 3 THEN
+	tmp2 := 3; // Reachable
+END_IF;	\end{GenericCode}
 	\centering
 	% 169ms
 	% 31 
 	% Violations 5
 	\caption{Demonstrates intraprocedural analysis. The procedure  FooOutput declares the first parameter as an IN parameter and therefore has no effect on the variable, while the other two parameters are declared as OUT parameters and might change. Note that the analysis does not check if the out parameter will be mutated, so it will be counted as if it would have. ABFunc is an instantiated algorithm block, which is similar to a class, and declares the parameters of the procedure \emph{algo1} in the same order. Note that the second occurrence of this method call contains named parameters. \emph{out1} and \emph{in\_out3} may be mutated.}
 	\label{code:func test 1}
-\end{figure}
-\begin{figure}[h!]
+\end{program}
+\begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{easy-func-test-cfg}
 	\caption{Control flow graph of example \ref{code:func test 1}}
 	\label{fig:func test 1 cfg}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{easy-func-test}
 	\caption{Analysis of example \ref{fig:func test 1 cfg}.}
@@ -193,7 +193,7 @@ Metrics:
 \end{figure}
 
 \section{Hard Example}
-This example in figure \ref{code:hard example 1} was found in the literature \cite{Click_1995} and it was stated, that the usual method for finding unreachable code is not able to detect this instance. 
+This example in Figure \ref{code:hard example 1} and Figure \ref{code:hard example 1 cfg} was found in the literature \cite{Click_1995} and it was stated, that the usual method for finding unreachable code is not able to detect this instance. 
 Since the implementation is different at its core, it was only natural to test and compare the results.
 Since no other functions were injected for this analysis, in contrast to the method described in chapter \ref{cha:state of the art}, this instance will be found and reported.
 Note that the loop contains a variable which does not change, which will never stop. Therefore the analysis would stop early and no violation would be reported without the correct configuration. 
@@ -207,30 +207,30 @@ Metrics:
 	\item Violation: block 4
 \end{itemize}
 
-\begin{figure}[h!]
+\begin{figure}
 	\begin{GenericCode}
-	x := 1;
+x := 1;
 	
-	REPEAT
-		b := x <> 1;
-		IF b = TRUE THEN
-			x := 2;
-		END_IF;    
-	UNTIL pred
-	END_REPEAT;	\end{GenericCode}
+REPEAT
+	b := x <> 1;
+	IF b = TRUE THEN
+		x := 2;
+	END_IF;    
+UNTIL pred
+END_REPEAT;	\end{GenericCode}
 	% 20ms
 	% 47
 	% Violation Block 4
 	\centering
 	\includegraphics[width=0.4\textwidth]{hard-example-cfg}
 	\caption{As described in \ref{code:ssa-defect} this procedure can not be analyzed correctly and will not report, that basic block 4 is unreachable. }
-	\label{code:hard example 1 cfg}
+	\label{code:hard example 1}
 \end{figure}
-\begin{figure}[h!]
+\begin{figure}
 	\centering
 	\includegraphics[width=0.7\textwidth]{hard-example}
 	\caption{Analysis of example \ref{code:hard example 1 cfg}.}
-	\label{code:hard example 1}
+	\label{code:hard example 1 cfg}
 \end{figure}
 
 

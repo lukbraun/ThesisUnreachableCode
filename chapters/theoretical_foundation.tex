@@ -6,15 +6,7 @@
 
 \section{Definitions \textasciitilde 1 site}
 \label{sec:definitions}
-% \emph{Unreachable Code} specifies a piece of source-code within a function, which can not be executed due to no feasible path.
-% There are two categories of unreachable code:
-%\begin{itemize}
-%	\item No path to the given piece of source-code exists, which is created by unconditional jumps, even tough other instructions would follow. 
-%	Many compilers already check for this type of error.
-%	\item Infeasible path conditions are the more common type found in programs and harder to detect. The complete environment has to be known during analysis (state of variables) and be taken into account. 
-%\end{itemize}
 
-% Fixing this type of error may be hard, since it indicates faulty logic created by accident. 
 The definition of unreachable code is rather complicated and confusing. 
 Similar terms like dead code and infeasible code are often tossed around and the definition appears to differ in many standards. 
 Sometimes the terms are used as aliases for each other.
@@ -27,7 +19,7 @@ In the following sections each term will be defined.
 Unreachable code is source code, which can never be reached (during execution). 
 The causes may either be due to:
 \begin{enumerate}
-	\item imperative statements that force a unconditional jump (even tough there are statements following) as shown in figure \ref{code:unconditional unreachable code}. Depending on language, these statements are: 
+	\item imperative statements that force a unconditional jump (even tough there are statements following) as shown in Listing \ref{code:unconditional unreachable code}. Depending on language, these statements are: 
 	\begin{itemize}
 		\item break
 		\item return
@@ -37,7 +29,7 @@ The causes may either be due to:
 \end{enumerate}
 
 
-\begin{figure}
+\begin{program}
 	\begin{CppCode}
 int unreachable_code_goto() {
 	int x = 42;
@@ -79,16 +71,11 @@ int checked_conditions(int x) {
 }\end{CppCode}
 	\caption{This example written in C++ demonstrates unreachable code due to unconditional jumps. When conditions were already checked within the same if-then-else block they are also considered unreachable.}
 	\label{code:unconditional unreachable code}
-\end{figure}
+\end{program}
 
 
 \subsection{Dead Code \textasciitilde 1/3 site}
 \label{sub:dead code}
-%emph{Dead Code} is that part of the source-code, which may be reachable, is not used any further. It is sometimes also referred to \emph{Unused Code}
-%(e.g. variables, classes or functions and methods, but also files \cite{Boomsma_2012}).
-%\emph{Dead Code} and \emph{Unreachable Code} are often confused. Some standards even describe \emph{Unreachable Code} as a subset of \emph{Dead Code} \cite{CWECWE561Dead}.
-%Declaring \emph{Unreachable Code} as \emph{Dead Code} is debatable, since \emph{Unreachable Code} is dead basically. The \emph{dead} part in this case would be an \emph{Instruction Block} within the \emph{Control-flow Graph}.
-%Removing \emph{Dead Code} is an easier task compared to other forms of defects since the unused part may simply be deleted.
 
 Dead code is code, which may be reachable, but is not used any further.
 The most common types of dead code is unused code:
@@ -99,7 +86,7 @@ The most common types of dead code is unused code:
 	\item Unused files \cite{Boomsma_2012}
 	\item ...
 \end{itemize}
-In figure \ref{code:dead code} some of these errors are presented. As presented, unnecessary assignments are also considered dead code.
+In Listing \ref{code:dead code} some of these errors are presented. As presented, unnecessary assignments are also considered dead code.
 
 
 The term \emph{dead} implies that the counterpart called \emph{live} exists. 
@@ -116,7 +103,7 @@ It is important to note, that according to this definition dead code may be reac
 
 % Unused statements, methods, variables (?)
 
-\begin{figure}
+\begin{program}
 	\begin{JavaCode}
 public class DeadCode {
 	public static int unusedVariable() {
@@ -143,7 +130,7 @@ public class DeadCode {
 }\end{JavaCode}
 	\caption{Some instances of dead code written in Java. The unnecessary assignment in line 11 does not have any effect. In case the file containing the class DeadCode is not used it would be considered as a dead file.}
 	\label{code:dead code}
-\end{figure}
+\end{program}
 
 \subsubsection{Is Unreachable Code Dead Code?}
 % Pro / Contra
@@ -178,10 +165,10 @@ Unreachable code, especially infeasible code, occurs due to faulty logic and may
 Infeasible code only occurs due to conditions which always evaluate to false. Another reason could be confusion around expressions \cite{Eichberg_2015}.
 
 
-Infeasible code may occur either due to conditions which only consist of boolean literals (and expressions), constants, or as consequence of former conditions, as demonstrated in figure \ref{code:infeasible code}.
+Infeasible code may occur either due to conditions which only consist of boolean literals (and expressions), constants, or as consequence of former conditions, as demonstrated in Listing \ref{code:infeasible code}.
 
 Infeasible code is a subset of unreachable code.
-\begin{figure}
+\begin{program}
 	\begin{JavaCode}
 public class InfeasibleCode {
 	public static void infeasibleConstant() {
@@ -210,7 +197,7 @@ public class InfeasibleCode {
 }\end{JavaCode}
 	\caption{Infeasible code is determined by conditions which always result with false. }
 	\label{code:infeasible code}
-\end{figure}
+\end{program}
 
 
 % \cite{Eichberg_2015}
