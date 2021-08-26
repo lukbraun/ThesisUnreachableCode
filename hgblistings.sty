@@ -62,6 +62,15 @@ keepspaces=true,%
 	#1}}%
 {}
 
+% Code Environment for C (ANSI)
+\lstnewenvironment{LispCode}[1][]
+{\lstset{%
+		language=Lisp,
+		keywords={check-sat,push,pop,get-value,declare-fun},
+		escapeinside={/+}{+/}, % makes "/+" and "+/" available for Latex escapes (labels etc.)
+		#1}}%
+{}
+
 
 % Code Environment for C++ (ISO)
 \lstnewenvironment{CppCode}[1][]

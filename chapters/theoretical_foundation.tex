@@ -1,10 +1,10 @@
 %!TEX root = ../main.tex
 
-\chapter {Theoretical Foundation \textasciitilde 15 sites}
+\chapter {Theoretical Foundation}
 \label {cha:theoretical foundation}
 % Einleitung schreiben
 
-\section{Definitions \textasciitilde 1 site}
+\section{Definitions}
 \label{sec:definitions}
 
 The definition of unreachable code is rather complicated and confusing. 
@@ -14,7 +14,7 @@ Sometimes the terms are used as aliases for each other.
 
 In the following sections each term will be defined.
 
-\subsection{Unreachable Code \textasciitilde 1/3 site}
+\subsection{Unreachable Code}
 \label{sub:unreachable code}
 Unreachable code is source code, which can never be reached (during execution). 
 The causes may either be due to:
@@ -74,7 +74,7 @@ int checked_conditions(int x) {
 \end{program}
 
 
-\subsection{Dead Code \textasciitilde 1/3 site}
+\subsection{Dead Code}
 \label{sub:dead code}
 
 Dead code is code, which may be reachable, but is not used any further.
@@ -159,7 +159,7 @@ The similarity between unreachable code and dead code is, that both do not have 
 As mentioned before the sources of these two error types are different.
 Dead code occurs for example, when intended extensibility or features are no longer required and are not deleted or refactored.
 Unreachable code, especially infeasible code, occurs due to faulty logic and may not as straightforward to fix.
-\subsection{Infeasible Code \textasciitilde 1/3 site}
+\subsection{Infeasible Code}
 \label{sub:infeasible code}
 
 Infeasible code only occurs due to conditions which always evaluate to false. Another reason could be confusion around expressions \cite{Eichberg_2015}.
@@ -207,52 +207,107 @@ public class InfeasibleCode {
 % Nur bedingungen
 
 
-\section{Kemro-IEC 61131-3 \textasciitilde 3 sites}
+\section{IEC 61131-3}
 \label{sec:iec}
-% TODO: Sprachfeatures beschreiben
-% https://webstore.iec.ch/preview/info_iec61131-3%7Bed3.0%7Db.pdf -> sind actually min 2 sprachen
-% \emph{IEC 61131-3} is a standard which specifies syntax and semantics for programmable controllers. 
-% Keine Dynamische Allokierung --> Alles vor Laufzeit
-% Kein Polymorphismus
-% Predictable Schedule
-% sehr async (events)
-% 4 sprachen - 2 textuelle + 2 graphische
-% Projects
-% - FU, AlgorithmBlock, Function
-% Variables - auch svs etc.
-% Statements & Instructions
-% Pointer Arithmetik
-% 
- 
-% \section{Abstract Syntax Tree \textasciitilde 1 site}
-% Aufbau
-% Unterschied zu normalem syntax tree
-% 
-% \section{Controlflow Graph \textasciitilde 1 sites}
-% Instruction Blocks
-% Kanten
-% Instructions
-% Verwendungszwecke
-% \section{Single Static Assignment Form \textasciitilde 1 sites}
-% Representation der Instruktionen, Variablen, etc.
-% Phi Funktion
-% Vorteile
-% Verwendungszweck
-% \section{Constant Propagation \textasciitilde 1 sites}
-% 
-% \section{Types of procedural Analysis}
-% Procedures are evaluated either \emph{Inter-} or \emph{Intra-proecedural}. 
 
-%During analysis of \emph{Functions} or \emph{Procedures} the calling of other \emph{Functions} and \emph{Procedures} may be taken into account to %enable more detailed information of programs.
+IEC 61131-3 is a standard, which concern the programming of PLCs (\emph{Programmable Logic Controller}). The standard does not describe itself as a rigid set of rules, but rather a guideline \cite{johnIEC611313Programming2010}. The implementation of this standard requires at least some features, but not necessarily all. Manufactures must declare, which requirements were implemented. This is done by feature tables, which are included in the standard. Benchmarks for assessing how close an implementation adheres to a standard are also included.
 
 
-%\begin{itemize}
-%	\item \emph{Intraprocedural Analysis} does not take \emph{Function-}/Procedure-calls into account. 
-%	\item \emph{Interprocedural Analysis} takes \emph{Function-}/Procedure-calls and their concrete return values into account.
-%\end{itemize}
+The standard is maintained by the independent organization PLCOpen \cite{eldijkWhatPLCopen2018}, which was founded in 1992 (after IEC 61131-3 was published) with a manufacturer and product independent standard in mind.
 
 
-\section{Satisfiable Modulo Theory \textasciitilde 3 sites}
+The standard does not only provide guidelines for manufacturers, but also for projects of end users \cite{johnIEC611313Programming2010}.
+\subsection{Program Organization Unit (POU)}
+\label{sub:pou}
+Projects are built of POUs. These organization units are encapsulated, which does not only enable modularization of code, but also independent compilation.
+There are three types of POUs \cite{johnIEC611313Programming2010}:
+\begin{itemize}
+	\item \emph{FBs} (\emph{Functionblock}) are the main building blocks of a program. Functionblocks can be instantiated. They may contain actual state (like a timer or counter). Functionblock types are visibly globally, but instances may be not. Inheritance is not intended.
+	\item \emph{Programs} represent the main program. These units are not called explicitly by other POUs, but otherwise behave like FBs.
+	\item \emph{Functions} basically are the same as regular, pure functions. Therefore functions do not contain any state and are not able to call Function Blocks, which may contain side effects. 
+\end{itemize}
+POUs contain two parts:
+\begin{itemize}
+	\item \emph{Declaration} of variables. Every variable that is used must be declared before.
+	\item \emph{Code} which contains the logic. 
+\end{itemize}
+POUs can be called with or without parameters. Parameters may be provided directly or via global/external variables.
+Recursion is not allowed, neither directly nor indirectly. 
+
+
+\subsection{Languages}
+\label{sub:iec-lang}
+The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
+\begin{itemize}
+	\item \emph{Instruction List} is an assembly like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
+	\item \emph{Structured Text} is a pascal-like, higher level programming language (see Listing \ref{code:st}).
+	\item \emph{Functionblock Diagram} are partly graphical and partly textual (see Figure \ref{code:fbd}). The language is inspired from the field of signal processing. 
+	\item \emph{Ladder Diagram} is a graphical language, mainly used when processing boolean values (see Figure \ref{code:ld}).
+	\item \emph{Sequential Function Chart} is a graphical language, whose goal is to break complex programs into small manageable units (see Figure \ref{code:sfc}). 
+\end{itemize}
+% \subsection{Variables}
+
+
+\begin{program}
+	\begin{GenericCode}
+VAR
+	FirstOperand, SecondOperand, Result: INT := 10;
+	StringOp: String[30] := '12345678901234567890';
+	StringRes: String[25];
+END_VAR
+
+B1:	LD FirstOperand (* 10 {INT} *)
+		ADD SecondOperand (* 20 {INT} *)
+		ST Result (* 20 {INT} *)
+		GT 0 (* TRUE, because 20 > 0 {BOOL} *)
+		JMPC B2
+		(* jump, because CR=TRUE; present value of CR remains {BOOL} *)
+		JMP FarAway (* CR is not defined or present value: *)
+		(* implementation-dependent *)
+B2: LD StringOp (* 12345678901234567890 {STRING} *)
+		ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
+	\caption{Example Instruction List program from the book \cite{johnIEC611313Programming2010}.}
+	\label{code:il}
+\end{program}
+
+\begin{program}
+	\begin{GenericCode}
+TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
+VAR d: INT;
+	e: ARRAY [0..9] OF INT; 
+	f: REAL;
+	g: MulVar (Var1:=10, Var2 := 2.3); 
+	h: MulVar;
+END_VAR
+d := 10; (* Assignment *)
+e[0] := d ** 2;   h  := g; (* Two assignments in one line *)
+d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode}
+	\caption{Example structured text program from the book \cite{johnIEC611313Programming2010}.}
+	\label{code:st}
+\end{program}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{fbd}
+	\caption{Example functionblock diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\label{code:fbd}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{ld}
+	\caption{Example ladder diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\label{code:ld}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.4\textwidth]{sfc}
+	\caption{Example sequential function chart diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\label{code:sfc}
+\end{figure}
+
+\section{Satisfiable Modulo Theory}
 \begin{quote}
 	Satisfiability modulo theories (SMT) generalizes boolean satisfiability (SAT) by
 	adding equality reasoning, arithmetic, fixed-size bit-vectors, arrays, quantifiers,
@@ -268,18 +323,48 @@ SMT-LIB offers standardization to implementing SMT-Solvers by defining a common 
 By using the same input and output format SMT-Solvers may be exchanged at any time. 
 This format is a LISP, which has some additional special functions used for direct interaction with the SMT-Solver. Since LISP is a functional programming language, the same characteristics are applied to SMT-Lib.
 For example mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
-Usually a SMT-LIB programm (see figure \ref{code:smt-lib}) begins with declaring functions. Variables may also be represented as functions. 
+Usually a SMT-LIB programm (see Listing \ref{code:smt-lib}) begins with declaring functions. Variables may also be represented as functions. 
 Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
 The last part contains an instruction for the SMT-Solver to check the satisfiability. 
 Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
 SMT-Solvers may also implement the simplification of a given expression.
 
-\begin{figure}
-	\begin{GenericCode}
-	\end{GenericCode}
-	\caption{SMT-Lib example program.}
+\begin{program}
+	\begin{LispCode}
+; declaring variables
+(declare-fun x () Int)
+(declare-fun y () Int)
+(declare-fun z () Int)
+
+(push 2) ; push next 2 constraints to stack
+; Add constraint
+(assert (= x y))
+; Add another constraint
+(assert (> y z))
+; Check satisfiability
+(check-sat)
+; => sat
+(push 1) ; push next constraint to stack
+; Add another constraint
+(assert (= z x))
+(check-sat)
+; => unsat
+(pop 1) ; pop last constraint from stack
+(check-sat)
+; => sat
+; get possible values of variables
+(get-value (x y z))
+; => ((x 0)
+;     (y 0)
+;     (z (- 1)))
+(pop 2) ; pop the last 2 constraints
+(push 1) ; push next constraint to the stack
+(assert (and (= x y) (> x z)))
+(check-sat)
+; => sat\end{LispCode}
+	\caption{SMT-Lib example program. Push and pop instructions add or remove the next $n$ assert statements. Checking satisfiability is done by the \emph{check-sat} instruction, returning either \emph{sat} or \emph{unsat}. The \emph{get-value} instruction delivers a possible set of assignments of given variables. }
 	\label{code:smt-lib}
-\end{figure}
+\end{program}
 
 
 
