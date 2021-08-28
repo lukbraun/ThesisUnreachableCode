@@ -237,7 +237,7 @@ Recursion is not allowed, neither directly nor indirectly.
 
 \subsection{Languages}
 \label{sub:iec-lang}
-the logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
+The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
 \begin{itemize}
 	\item \emph{Instruction List} is an assembly like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
 	\item \emph{Structured Text} is a pascal-like, higher-level programming language (see Listing \ref{code:st}).
@@ -308,11 +308,14 @@ the logic part of POUs may be implemented in one of five distinct programming la
 \end{figure}
 
 \section{Satisfiable Modulo Theory}
+
+Satisfiable modulo theory (short SMT) is defined as stated in \cite{demouraZ3EfficientSMT2008}:
+
 \begin{quote}
 	Satisfiability modulo theories (SMT) generalizes boolean satisfiability (SAT) by
 	adding equality reasoning, arithmetic, fixed-size bit vectors, arrays, quantifiers,
 	and other useful first-order theories. An SMT solver is a tool for deciding the satisfiability (or dually the validity) of formulas in these theories. SMT solvers enable
-	applications such as extended static checking, predicate abstraction, test case generation, and bounded model checking over infinite domains, to mention a few. \cite{demouraZ3EfficientSMT2008}
+	applications such as extended static checking, predicate abstraction, test case generation, and bounded model checking over infinite domains, to mention a few. 
 \end{quote}
 
 The basis of an SMT-Solver is a SAT-Solver, which solves boolean formulas only. SMT-Solvers may function as a separate program or may be imported as a module/package into a program. 

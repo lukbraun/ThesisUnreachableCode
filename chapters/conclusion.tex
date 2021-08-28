@@ -3,7 +3,10 @@
 \chapter{Conclusion}
 \label{cha:conclusion}
 
-Even though procedures are checking intraprocedurally, rather than interprocedurally, the implementation provides good results. It is not only able to find basic instances of unreachable code, but also rather complicated incidents, which cannot be found by going for a traditional approach.
+Even though procedures are checking intraprocedurally, rather than interprocedurally, the implementation provides good results. It is not only able to find basic instances of unreachable code, but also rather complicated incidents, which cannot be found by going for a traditional approach. 
+The implementation could be the basis for other checks. SMT-solvers simplify checking predicates and the already existing architecture keeps the state of variables in check. 
+Implementing different rules on top of that architecture may enable sophisticated checks.
+This possibility may be explored in the future.
 
 
 As mentioned in a previous Section \ref{sub:problems and barriers}, the downside of this approach is runtime. Programs containing loops, especially when nested, create many incidents that have to be checked. Since loops are one of the most essential instructions in programming, they occur often naturally. 

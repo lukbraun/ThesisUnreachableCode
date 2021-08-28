@@ -333,7 +333,7 @@ But being able to find this kind of defects comes with greater execution time. W
 	\end{itemize}
 \end{itemize}
 
-\subsection{Handling Procedure - and Function-calls}
+\subsection{Handling Procedure and Function calls}
 \label{sub:handling procedure and function calls}
 Procedure and function calls are handled intraprocedurally, meaning return values are not calculated. That simply means every function call just checks if the declaration contains any (mutable) in and out parameters or is used on the right hand side of an assignment.
 Either way said variables must reset their state, since the value may change. 
