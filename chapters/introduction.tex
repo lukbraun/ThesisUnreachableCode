@@ -3,26 +3,26 @@
 \chapter{Introduction}
 \label{cha:introduction}
 
-Unreachable Code Detection nowadays is integrated in almost every available static code analysis software as well as Integrated Developments Environments and to some extent even compilers.
-Unreachable Code is defined as Code that can never be reached, because either the program flow ended prematurely or due to unsatisfiable path conditions.
-These types do not only increase the size of the program, but also increase the overall complexity of the sourcecode or may even lead to unwanted behavior and errors (e.g. goto-fail bug \cite{Boyes_2014}).
+Unreachable Code Detection nowadays is integrated in almost every available static code analysis software as well as Integrated Development Environments and to some extent even compilers.
+Unreachable Code is defined as Code that can never be reached, because either the program flow ended prematurely or due to unsatisfiable path conditions, as seen in Listing \ref{code:ex1}.
+These types do not only increase the size of the program, but also increase the overall complexity of the source code or may even lead to unwanted behavior and errors (e.g., goto-fail bug \cite{Boyes_2014}).
 
 \section{Motivation}
 \label{sec:motivation}
 Using Static code analysis to find errors before compiling, building or rolling out software is a very essential part of the software development process.
-These tools are able to identify a wide range of Errors or make suggestions for adhering to a better style.
-Finding errors in sourcecode as it is written will not only make the program more robust, but also makes it more comprehensible, which leads to less time and energy needed during maintenence.
-Especially \emph{Unreachable -, Unneccessary - and Dead Code} are a main source of incomprehensible sourcecode \cite{Romano_2020}.
-In some instances \emph{Unreachable Code} may be intended due to extensibility of the program \cite{Haas_2020} and may even not be clear if it is intended or not.
-Before the break-through of the Object Oriented Paradigm many Programs were developed in an imperative, procedural way. Some Styleguides of that time suggested splitting files into so many smaller Files containing few Functions and/or procedures \cite{Srivastava_1992}.
-Interestingly the emerge of the Object Oriented Paradigm and its languages to the de-facto standard increased the precentage of \emph{Unreachable - and Dead Code} \cite{Srivastava_1992}.
-In extreme cases Dead Code may even lead to the so called Anti-pattern Lava-Flow \cite{Romano_2020}, which typically occurs when Dead Code will not be removed and has to be maintained, even tough it does not do much or even anything at all.
-Systems that undergo constant evolution, like Web Systems, are also prone to Lava-flow and Unreachable Code \cite{Boomsma_2012}.
+These tools are able to identify a wide range of errors or make suggestions for adhering to a better style.
+Finding errors in source code as it is written will not only make the program more robust, but also makes it more comprehensible, which leads to less time and energy needed during maintenance.
+Especially unreachable, unnecessary and dead code are a main source of incomprehensible source code \cite{Romano_2020}.
+In some instances unreachable code may be intended due to extensibility of the program \cite{Haas_2020} and may even not be clear if it is intended or not.
+Before the breakthrough of the Object-Oriented Paradigm many Programs were developed in an imperative, procedural way. Some Styleguides of that time suggested splitting files into so many smaller files containing few functions or procedures \cite{Srivastava_1992}.
+Interestingly, the emerge of the Object-Oriented Paradigm and its languages to the de facto standard increased the percentage of \emph{Unreachable - and Dead Code} \cite{Srivastava_1992}.
+In extreme cases dead code may even lead to the so-called Anti-pattern Lava-Flow \cite{Romano_2020}, which typically occurs when Dead Code will not be removed and has to be maintained, even though it does not do much or even anything at all.
+Systems that undergo constant evolution, like Web Systems, are also prone to lava-flow and Unreachable Code \cite{Boomsma_2012}.
 
 \emph{Unreachable Code} is often confused with similar defects and different definitions are used.
-It is often confused with \emph{Dead Code}.
+It is often confused with dead code.
 
-Analyzing these kind if defects requires the program to be represented in form of a \emph{controlflow graph} \ref{fig:cfg}.
+Analyzing these kinds if defects requires the program to be represented in form of a \emph{control flow graph} \ref{fig:cfg}.
 
 
 \begin{program}
@@ -50,19 +50,19 @@ END_IF;\end{GenericCode}
 \end{program}
 \begin{figure}
   \centering
-  \includegraphics[width=1\textwidth]{minimal-example}
-  \caption{The constructed controlflow graph of Listing \ref{code:ex1}. Edges are marked either with l - describing the path if the condition results true - or r. Loops (and sometimes gotos) may easily spotted since it is the only possibility for arrows pointing to former nodes.}
+  \includegraphics[width=1\textwidth]{minimal-example-cfg}
+  \caption{The constructed control flow graph of Listing \ref{code:ex1}. Edges are marked either with then, describing the path if the condition results true, or else. Loops (and sometimes gotos) may easily be spotted since it is the only possibility for arrows pointing to former nodes.}
   \label{fig:cfg}
 \end{figure}
 
-It is worth mentioning that controlflow graphs may be altered to make analysis easier, like single static assignment, which introduces many artifical variables to prevent redefinition of variables.
+It is worth mentioning that control flow graphs may be altered to make analysis easier, like single static assignment, which introduces many artificial variables to prevent redefinition of variables.
 
 \section{Project Overview}
 \label{sec:project overview}
 This thesis is written as a part of a research project between the \emph{Software Competence Center Hagenberg GmbH} \cite{ScchGmbH} and \emph{Engel Austria GmbH} \cite{EngelGmbH}.
 Engel produces injection molding machines, which are programmed using the \emph{Kemro-IEC} language, a dialect of the \emph{IEC 61131-3} standard language.
-The project began as a joint work between the \emph{Software Competence Center Hagenberg} and the \emph{Johannes Kepler University Linz} \cite{jku, Prahofer_2012} within the competence centers programme COMET of the Austrian Research Promotion Agency (FFG).
-Over the years multiple rules identifying a wide range of errors were implemented, for example detecting unguarded division, where the divisor could potentially be zero, finding unused variables, highlighting high complexitiy of expressions, detecting Dead Code and other defects.
+The project began as a joint work between the \emph{Software Competence Center Hagenberg} and the \emph{Johannes Kepler University Linz} \cite{jku, Prahofer_2012} within the competence centers program COMET of the Austrian Research Promotion Agency (FFG).
+Over the years multiple rules identifying a wide range of errors were implemented, for example detecting unguarded division, where the divisor could potentially be zero, finding unused variables, highlighting high complexity of expressions, detecting dead code and other defects.
 
 \section{Objective of this thesis}
 \label{sec:objective}
@@ -92,8 +92,8 @@ Over the years multiple rules identifying a wide range of errors were implemente
 
 This thesis is structured into the following chapters:
 \begin{itemize}
-	\item \emph{Theoretical Foundation} defines the differences between unreachable, unnecessary and dead code will be defined. The standard IEC 61131-3 will also be presented, including provided languages and the structure of such programs. At last the concept of SMT solvers are explained and what use cases they excel in.
-	\item \emph{State of the Art} explores already existing tools targeting java source code. Beginning at the java compiler itself to analyzers in integrated development environments to specialized plugins and services, which potentially could run in the cloud. It should be noted, that all these described tools could be used together for maximum coverage.
+	\item \emph{Theoretical Foundation} defines the differences between unreachable, unnecessary and dead code will be defined. The standard IEC 61131-3 will also be presented, including provided languages and the structure of such programs. At last the concept of SMT solvers are explained and what use cases, they excel in.
+	\item \emph{State of the Art} explores already existing tools targeting java source code. Beginning at the java compiler itself to analyzers in integrated development environments to specialized plugins and services, which potentially could run in the cloud. It should be noted that all these described tools could be used together for maximum coverage.
 	\item \emph{Finding unreachable code using a SMT-Solver} contains the idea and description of the implementation for discovering unreachable code. After an overview of the already existing architecture, the procedure of each step is described in detail.
 	\item \emph{Evaluation} contains examples and their results/violations. These examples range from trivial to hard.
 \end{itemize}
