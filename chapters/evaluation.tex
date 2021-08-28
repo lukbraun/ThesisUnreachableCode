@@ -8,16 +8,16 @@ Each example provides the code, the control flow graph, a description and some m
 
 \section{Basic Example}
 This example in Figure \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even though there are procedure calls, they cannot change them, since they are only declared as input variables).
-Basically this algorithm contains simple assignments and conditions, which eventually lead to unreachable code when combined, only.
-As described at Figure \ref{code:basic example 1}, basicblock 11 is not reachable, a consequence of the condition in line 15.
-Even tough a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
+Basically, this algorithm contains simple assignments and conditions, which eventually lead to unreachable code when combined, only.
+As described at Figure \ref{code:basic example 1}, basic block 11 is not reachable, a consequence of the condition in line 15.
+Even though a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
 The idea of the implementation originated from this example.
 
 Metrics:
 \begin{itemize}
-	\item Runtime: 581ms
+	\item Runtime: 581 ms
 	\item Number of analyzed instruction blocks: 17
-	\item Violation: block 11
+	\item Violations: block 11
 \end{itemize}
 
 % 581ms
@@ -65,18 +65,18 @@ The following examples contain an almost identical algorithm. The only differenc
 
 Metrics (Example 1):
 \begin{itemize}
-	\item Runtime: 61ms
+	\item Runtime: 61 ms
 	\item Number of analyzed instruction blocks: 20
-	\item Violation: block 6
+	\item Violations: block 6
 \end{itemize}
 
 
 
 Metrics (Example 2):
 \begin{itemize}
-	\item Runtime: <1ms
+	\item Runtime: <1 ms
 	\item Number of analyzed instruction blocks: 68
-	\item Violation: none
+	\item Violations: none
 \end{itemize}
 
 
@@ -97,7 +97,7 @@ END_IF;	\end{GenericCode}
 	% 20
 	% Violation für block 6
 	\includegraphics[width=0.6\textwidth]{basic-while-cfg}
-	\caption{The variable i will changes inside the loop. As long as x is not equal to 3, the basic block 6 is unreachable. }
+	\caption{The variable i will change inside the loop. As long as x is not equal to 3, the basic block 6 is unreachable. }
 	\label{code:loop example 1 cfg}
 \end{figure}
 \begin{figure}
@@ -132,16 +132,16 @@ END_IF;		\end{GenericCode}
 	\label{code:loop example 2}
 \end{figure}
 \section{Function- and Procedure-Calls}
-This example in Listing \ref{code:func test 1} demonstrates the handling of function- and procedure-calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
-As described in section \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
-Due to this circumstances basic block 5 and 9 are not reachable.
+This example in Listing \ref{code:func test 1} demonstrates the handling of function- and procedure calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
+As described in Section, \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
+Due to these circumstances, basic blocks 5 and 9 are not reachable.
 
 
 Metrics:
 \begin{itemize}
-	\item Runtime: 169ms
+	\item Runtime: 169 ms
 	\item Number of analyzed instruction blocks: 31
-	\item Violation: block 5
+	\item Violations: block 5
 \end{itemize}
 
 
@@ -193,7 +193,7 @@ END_IF;	\end{GenericCode}
 \end{figure}
 
 \section{Hard Example}
-This example in Figure \ref{code:hard example 1} and Figure \ref{code:hard example 1 cfg} was found in the literature \cite{Click_1995} and it was stated, that the usual method for finding unreachable code is not able to detect this instance. 
+This example in Figure \ref{code:hard example 1} and Figure \ref{code:hard example 1 cfg} was found in the literature \cite{Click_1995} and it was stated that the usual method for finding unreachable code is not able to detect this instance. 
 Since the implementation is different at its core, it was only natural to test and compare the results.
 Since no other functions were injected for this analysis, in contrast to the method described in chapter \ref{cha:state of the art}, this instance will be found and reported.
 Note that the loop contains a variable which does not change, which will never stop. Therefore the analysis would stop early and no violation would be reported without the correct configuration. 
@@ -202,9 +202,9 @@ If the condition would have been different, it is easier to detect, but since th
 
 Metrics:
 \begin{itemize}
-	\item Runtime: 20ms
+	\item Runtime: 20 ms
 	\item Number of analyzed instruction blocks: 47
-	\item Violation: block 4
+	\item Violations: block 4
 \end{itemize}
 
 \begin{figure}
@@ -223,7 +223,7 @@ END_REPEAT;	\end{GenericCode}
 	% Violation Block 4
 	\centering
 	\includegraphics[width=0.4\textwidth]{hard-example-cfg}
-	\caption{As described in \ref{code:ssa-defect} this procedure can not be analyzed correctly and will not report, that basic block 4 is unreachable. }
+	\caption{As described in \ref{code:ssa-defect} this procedure cannot be analyzed correctly and will not report that basic block 4 is unreachable. }
 	\label{code:hard example 1}
 \end{figure}
 \begin{figure}

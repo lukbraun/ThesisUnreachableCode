@@ -3,11 +3,11 @@
 \chapter{Conclusion}
 \label{cha:conclusion}
 
-Even tough procedures are check intraprocedurally, rather than interprocedurally, the implementation provides good results. It is not only able to find basic instances of unreachable code, but also rather complicated incidents, which can not be found by going for a traditional approach.
+Even though procedures are checking intraprocedurally, rather than interprocedurally, the implementation provides good results. It is not only able to find basic instances of unreachable code, but also rather complicated incidents, which cannot be found by going for a traditional approach.
 
 
 As mentioned in a previous Section \ref{sub:problems and barriers}, the downside of this approach is runtime. Programs containing loops, especially when nested, create many incidents that have to be checked. Since loops are one of the most essential instructions in programming, they occur often naturally. 
 This complexity has to be addressed, because otherwise it does not make any sense to use this analysis in production, especially for bigger projects.
 
 
-Other tools, like sonarqube, as described in Section \ref{sec:sonar}, for example, do not offer to check loops to a full extent, but still manage to find a decent amount of violations. Joogie, as described in Section \ref{sec:sca paper}, simplifies loops into three unwindings. Similar forms of preprocessing could reduce runtime significantly by trading a little bit of accuracy, making it usable in production. 
+Other tools, like sonarqube, as described in Section \ref{sec:sonar}, for example, do not offer to check loops to a full extent, but still manage to find a decent number of violations. Joogie, as described in Section \ref{sec:sca paper}, simplifies loops into three unwindings. Similar forms of preprocessing could reduce runtime significantly by trading a little bit of accuracy, making it usable in production. 

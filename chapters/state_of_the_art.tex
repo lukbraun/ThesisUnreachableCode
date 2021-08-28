@@ -140,25 +140,25 @@ void testBreak2() {
 	\label{code:Java unexpected break}
 \end{program}
 
-Regarding unreachable code the Java compiler performs a data flow analysis. The liveness of each statement will be analyzed by the "AliveAnalyzer" class in Flow.Java. The implemented AST-model makes use of the visitor pattern \cite{gammaDesignPatternsElements}. During analysis each node will be visited and checked according to definition \ref{quote:Java unreachable definition}.
+Regarding unreachable code the Java compiler performs a data-flow analysis. The liveness of each statement will be analyzed by the "AliveAnalyzer" class in Flow.Java. The implemented AST-model makes use of the visitor pattern \cite{gammaDesignPatternsElements}. During analysis each node will be visited and checked according to definition \ref{quote:Java unreachable definition}.
 
 
 
 \section{Integrated Development Environments}
 \label{sec:intelliJ}
 Integrated Development Environments (IDE) are used by almost every software developer daily and an integral tool for creating correct and safe code.
-In comparison to simple text editors IDEs only support a few select programming languages. Generally they provide better support and usually do contain some sort of static code analysis to assist a developer writing good code. 
+In comparison to simple text editors IDEs only support a few select programming languages. Generally, they provide better support and usually do contain some sort of static code analysis to assist a developer writing good code. 
 Depending on the IDE, static code analysis can be configured to be more or less strict. 
-When the IDE contains an extensive plugin system then custom analysis tools may be used for a possibly even more precise method to find potential bugs.
+When the IDE contains an extensive plugin system, then custom-made analysis tools may be used for a possibly even more precise method to find potential bugs.
 
 
 Regarding unreachable code the following IDEs were analyzed:
 \begin{itemize}
-	\item \emph{Eclipse} \cite{incCommunityOpenInnovation} is an IDE primarily focused on developing Java projects. A basic, configurable inspection tool is integrated. Additional to the checks by the Java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in Listing \ref{code:Java eclipse intelij always true or false}. Generally the inspector is very basic regarding unreachabe code detection. As shown in Listing \ref{code:Java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g. Integer) are also taken into account. Besides that Eclipse is extensible and many additional tools for more sophisticated analysis exist.
-	\item \emph{IntelliJ Idea} \cite{IntelliJIDEACapable} is an IDE used for developing projects in various popular programming languages (e.g. Java, C\#, Python, JavaScript, etc.). For the Java language a code inspector can be configured to find different categories of errors. By default two important rules are activated to deliver warnings: 
+	\item \emph{Eclipse} \cite{incCommunityOpenInnovation} is an IDE primarily focused on developing Java projects. A basic, configurable inspection tool is integrated. Additional to the checks by the Java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in Listing \ref{code:Java eclipse intelij always true or false}. Generally, the inspector is very basic regarding unreachable code detection. As shown in Listing \ref{code:Java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g., Integer) are also taken into account. Besides that Eclipse is extensible and many additional tools for more sophisticated analysis exist.
+	\item \emph{IntelliJ Idea} \cite{IntelliJIDEACapable} is an IDE used for developing projects in various popular programming languages (e.g., Java, C\#, Python, JavaScript). For the Java language, a code inspector can be configured to find different categories of errors. By default two important rules are activated to deliver warnings: 
 	\begin{itemize}
-		\item \emph{Constant conditional expressions}, which do not only check for boolean literals in conditions, but also take values of variables, in case they always have the same value, and even other datatypes (e.g. Integer) into account as shown in Listing \ref{code:Java eclipse intelij always true or false}
-		\item \emph{Duplicate Condition} that have already been checked. Even tough this may sometimes be intended, in most cases they are overlooked or may even not be reached, when the method terminates in the branch followed by the former condition as shown in Listing \ref{code:Java intelij duplicate conditions}. 
+		\item \emph{Constant conditional expressions}, which do not only check for boolean literals in conditions, but also take values of variables, in case they always have the same value, and even other data types (e.g., Integer) into account as shown in Listing \ref{code:Java eclipse intelij always true or false}
+		\item \emph{Duplicate Condition} that have already been checked. Even though this may sometimes be intended, in most cases they are overlooked or may even not be reached, when the method terminates in the branch followed by the former condition as shown in Listing \ref{code:Java intelij duplicate conditions}. 
 	\end{itemize}
 	IntelliJ also provides a plugin system and therefore the possibility integrating an even better analysis is given.
 \end{itemize}
@@ -228,13 +228,13 @@ void duplicateConditions(int s_operationHour, int m_operationHour) {
 \label{sec:sonar}
 \emph{Sonarqube} \cite{sonarqube} and \emph{Sonarlint} \cite{SonarLintFixIssues} are products created by \emph{Sonarsource} \cite{CodeQualityCode}. Sonarqube is a static code analysis solution used in conjunction with a build server.
 Commonly this analysis is either triggered after pushing commits, scheduled at certain times of the day or a combination of both.
-Sonarqube supports a multitude of programming languages ranging from Java to Python and even COBOL. Another languages may be supported in form of a plugin.
+Sonarqube supports a multitude of programming languages ranging from Java to Python and even COBOL. Another language may be supported in form of a plugin.
 
 
 Sonarlint is available for some IDEs (including Eclipse and IntelliJ) in form of a plugin to provide immediate feedback. Note that this plugin only covers a subset of functionalities of sonarqube, but still provides better support than many internal inspectors built into IDEs.
 
 
-Using the same example as before (seen in Listing \ref{code:Java intelij duplicate conditions}) Sonarqube detectes that this expression always evaluates to false, which provides better information than the internal code inspector of IntelliJ, as demonstrated in Listing \ref{code:Java sonarqube duplicate conditions}.
+Using the same example as before (seen in Listing \ref{code:Java intelij duplicate conditions}) Sonarqube detects that this expression always evaluates to false, which provides better information than the internal code inspector of IntelliJ, as demonstrated in Listing \ref{code:Java sonarqube duplicate conditions}.
 
 \begin{program}
 	\begin{JavaCode}
@@ -292,13 +292,13 @@ The example shown in Listing \ref{code:Java sonarqube hard example} cannot be de
 \label{sec:sca paper}
 % TODO: Verbessern und Beispiele hinzufügen
 Joogie \cite{arltJoogieInfeasibleCode2012, arltJoogieJavaJimple2013} identifies infeasible code of any Java-project using a verification system. 
-At first the source code will be transformed into a 3-address intermediate representation of Java-bytecode using the Soot framework. Consequently only 15 kinds of statements are considered. 
+At first the source code will be transformed into a 3-address intermediate representation of Java bytecode using the Soot framework. Consequently only 15 kinds of statements are considered. 
 
-Afterwards the Java-bytecode is transformed into the Boogie language, which is an imperative intermediate verification language for analyzing high level programming languages.
-During the translation the memory model has to be preserved. The heap is represented by a two dimensional array. The first index refers to the object's address and the second to the field of the object.
+Afterwards the Java bytecode is transformed into the Boogie language, which is an imperative intermediate verification language for analyzing high-level programming languages.
+During the translation the memory model has to be preserved. The heap is represented by a two-dimensional array. The first index refers to the object's address and the second to the field of the object.
 
-Loops are unwinded into 3 unwindings: the first and last iteration, as well as an abstract unwinding of the rest.
-The result is a program containing no loops. Every Assignment inside the loop replaces the value into non-determined values. Therefore loops are not fully evaluated.
+Loops are unwound into three unwindings: the first and last iteration, as well as an abstract unwinding of the rest.
+The result is a program containing no loops. Every assignment inside the loop replaces the value into non-determined values. Therefore loops are not fully evaluated.
 
 
 Methods are checked in an intraprocedural manner. Therefore variables that may change become non-deterministic. 
@@ -309,11 +309,11 @@ The foundation of the verifier is the SMT-solver Z3.
 
 
 
-When infeasible code is encountered, the Java-bytecode will be transformed back into Java and a violation will be reported.
+When infeasible code is encountered, the java bytecode will be transformed back into Java and a violation will be reported.
 
 
 This tool was tested on 4 bigger open source software projects including ArgoUML, TerpWord, Rachota and Freemind, and only few false warnings were reported.
-The time needed for analysis was tolerable, since usually only small code fragements have to be analyzed instead of the whole project.
+The time needed for analysis was tolerable, since usually only small code fragments have to be analyzed instead of the whole project.
 
 This tool is as capable as Sonarqube \ref{sec:sonar} in finding unreachable code.
 

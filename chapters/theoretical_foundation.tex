@@ -12,14 +12,14 @@ Similar terms like dead code and infeasible code are often tossed around and the
 Sometimes the terms are used as aliases for each other.
 
 
-In the following sections each term will be defined.
+In the following Sections, each term will be defined.
 
-\subsection{Unreachable Code}
+\subsection{Unreachable code}
 \label{sub:unreachable code}
-Unreachable code is source code, which can never be reached (during execution). 
+unreachable code is source code, which can never be reached (during execution). 
 The causes may either be due to:
 \begin{enumerate}
-	\item imperative statements that force a unconditional jump (even tough there are statements following) as shown in Listing \ref{code:unconditional unreachable code}. Depending on language, these statements are: 
+	\item Imperative statements that force an unconditional jump (even though there are statements following) as shown in Listing \ref{code:unconditional unreachable code}. Depending on language, these statements are 
 	\begin{itemize}
 		\item break
 		\item return
@@ -31,44 +31,44 @@ The causes may either be due to:
 
 \begin{program}
 	\begin{CppCode}
-int unreachable_code_goto() {
-	int x = 42;
-	goto end;
-	x = 43; // unreachable
-	end: return x;
-}
-
-int unreachable_code_return() {
-	int x = 42;
-	return x;
-	x = 43; // unreachable
-}
-
-int unreachable_code_break() {
-	int x = 42;
-	while(true) {
-		break;
-		x = 43; // unreachable
-	}
-	return x;
-}
-
-int unreachable_code_exception(int x) {
-	if(x != 42) {
-		throw "X is not 42";
-		x = 42; // unreachable
-	}
-	return x;
-}
-
-int checked_conditions(int x) {
-	if(x == 42) {
-		return 42;
-	} else if(x == 42) { // This condtion was checked already => unreachable
-		return 42;
-	}
-	return x;
-}\end{CppCode}
+		int unreachable_code_goto() {
+			int x = 42;
+			goto end;
+			x = 43; // unreachable
+			end: return x;
+		}
+		
+		int unreachable_code_return() {
+			int x = 42;
+			return x;
+			x = 43; // unreachable
+		}
+		
+		int unreachable_code_break() {
+			int x = 42;
+			while(true) {
+				break;
+				x = 43; // unreachable
+			}
+			return x;
+		}
+		
+		int unreachable_code_exception(int x) {
+			if(x != 42) {
+				throw "X is not 42";
+				x = 42; // unreachable
+			}
+			return x;
+		}
+		
+		int checked_conditions(int x) {
+			if(x == 42) {
+				return 42;
+			} else if(x == 42) { // This condtion was checked already => unreachable
+				return 42;
+			}
+			return x;
+	}\end{CppCode}
 	\caption{This example written in C++ demonstrates unreachable code due to unconditional jumps. When conditions were already checked within the same if-then-else block they are also considered unreachable.}
 	\label{code:unconditional unreachable code}
 \end{program}
@@ -90,13 +90,13 @@ In Listing \ref{code:dead code} some of these errors are presented. As presented
 
 
 The term \emph{dead} implies that the counterpart called \emph{live} exists. 
-The \emph{Liveness} of an expression indicates, if it has any impact on the program when executed.
+The \emph{Liveness} of an expression indicates if it has any impact on the program when executed.
 Dead code is usually a sign of an unnecessary baggage and should be deleted, which is often easy since it is not used anyways.
-When dead code is not deleted and more and more instances of dead code are accumulated, it will become harder to maintain and comprehend \cite{Romano_2020}. Dead code may be intended in foresight of extensiblility. But when this extensibility is no longer intended, the already implemented mechanisms may include dead code. This code must be refactored or removed, otherwise it results in worse maintainability and 
-Source code written in object oriented programming languages do contain significantly more dead code according to the research paper \cite{Srivastava_1992}.
+When dead code is not deleted and more and more instances of dead code are accumulated, it will become harder to maintain and comprehend \cite{Romano_2020}. Dead code may be intended in foresight of extensibility. But when this extensibility is no longer intended, the already implemented mechanisms may include dead code. This code must be refactored or removed, otherwise it results in worse maintainability and 
+source code written in object-oriented programming languages do contain significantly more dead code according to the research paper \cite{Srivastava_1992}.
 
 
-It is important to note, that according to this definition dead code may be reachable, but does not have to be.
+It is important to note that according to this definition dead code may be reachable, but does not have to be.
 
 % \cite{Romano_2016}
 % \cite{Boomsma_2012}
@@ -105,29 +105,29 @@ It is important to note, that according to this definition dead code may be reac
 
 \begin{program}
 	\begin{JavaCode}
-public class DeadCode {
-	public static int unusedVariable() {
-		int i = 1; // Unused variable
-		int j = 3;
-		int x = 3 + j;
-		return x;
-	}
+		public class DeadCode {
+			public static int unusedVariable() {
+				int i = 1; // Unused variable
+				int j = 3;
+				int x = 3 + j;
+				return x;
+			}
 			
-	public static int unnecessaryAssignment() {
-		int x;
-		x = 4; // Unnecessary Assignment
-		x = 3;
-		return x;
-	}
+			public static int unnecessaryAssignment() {
+				int x;
+				x = 4; // Unnecessary Assignment
+				x = 3;
+				return x;
+			}
 			
-	private static class UnusedClass {
-		// This class is not used (and cannot be accessed from outside this class)
-	}
+			private static class UnusedClass {
+				// This class is not used (and cannot be accessed from outside this class)
+			}
 			
-	private static void unusedMethod() {
-		// This method is not used (and cannot be accessed from outside this class)
-	}
-}\end{JavaCode}
+			private static void unusedMethod() {
+				// This method is not used (and cannot be accessed from outside this class)
+			}
+	}\end{JavaCode}
 	\caption{Some instances of dead code written in Java. The unnecessary assignment in line 11 does not have any effect. In case the file containing the class DeadCode is not used it would be considered as a dead file.}
 	\label{code:dead code}
 \end{program}
@@ -139,21 +139,21 @@ Some standards, like MITRE-CWE \cite{CWECWE561Dead} define dead code as follows:
 \begin{quote}
 	Dead code is source code that can never be executed in a running program. The surrounding code makes it impossible for a section of code to ever be executed.
 \end{quote}
-This definition does not have anything in common with the one provided before. According to this standard, dead code is unreachable code, since it cannot be executed. But unnecessary assignments are not considered dead code, but has its own category \emph{Assignment to Variable without Use}.
-Both of this issues are considered as \emph{Irrelevant Code}.
+This definition does not have anything in common with the one provided before. According to this standard, dead code is unreachable code, since it cannot be executed. But unnecessary assignments are not considered dead code, but has its own category \emph{Assignment to Variable Without Use}.
+Both of these issues are considered as \emph{Irrelevant Code}.
 
 
 In contrast the standard MISRA-C \cite{motorindustrysoftwarereliabilityassociationMISRAC2004Guidelines2008} defines unreachable code as follows:
 \begin{quote}
-Rule 14.1 (required): There shall be no unreachable code.
-This  rule  refers  to  code  which  cannot  under  any  circumstances  be  reached,  and  which  can  be 
-identified as such at compile time. Code that can be reached but may never be executed is excluded 
-from the rule (e.g. defensive programming code).	
+	Rule 14.1 (required): There shall be no unreachable code.
+	This  rule  refers  to  code,  which  cannot  under  any  circumstances  be  reached,  and  which  can  be 
+	identified at compile time. Code that can be reached but may never be executed is excluded 
+	from the rule (e.g., defensive programming code).	
 \end{quote}
 Semantically both definitions are the same. The only difference is the naming.
 
 
-The similarity between unreachable code and dead code is, that both do not have an effect on a running program. But dead code (as described in this document) may be reachable, but is just unnecessary, especially when executed. 
+The similarity between unreachable code and dead code is that both do not have an effect on a running program. But dead code (as described in this document) may be reachable, but is just unnecessary, especially when executed. 
 
 
 As mentioned before the sources of these two error types are different.
@@ -170,31 +170,31 @@ Infeasible code may occur either due to conditions which only consist of boolean
 Infeasible code is a subset of unreachable code.
 \begin{program}
 	\begin{JavaCode}
-public class InfeasibleCode {
-	public static void infeasibleConstant() {
-		if(false) {
-			// always false
-			// ...
-		}
-	}
-			
-	public static void alwaysInfeasibleVariable() {
-		boolean x = false;
-		if(x) {
-			// always false
-			// ...
-		}
-	}
-			
-	public static void infeasibleConditions(int x) {
-		if(x > 10) {
-			if(x < 10) {
-				// always false
-				// ...
+		public class InfeasibleCode {
+			public static void infeasibleConstant() {
+				if(false) {
+					// always false
+					// ...
+				}
 			}
-		}
-	}
-}\end{JavaCode}
+			
+			public static void alwaysInfeasibleVariable() {
+				boolean x = false;
+				if(x) {
+					// always false
+					// ...
+				}
+			}
+			
+			public static void infeasibleConditions(int x) {
+				if(x > 10) {
+					if(x < 10) {
+						// always false
+						// ...
+					}
+				}
+			}
+	}\end{JavaCode}
 	\caption{Infeasible code is determined by conditions which always result with false. }
 	\label{code:infeasible code}
 \end{program}
@@ -219,10 +219,10 @@ The standard is maintained by the independent organization PLCOpen \cite{eldijkW
 The standard does not only provide guidelines for manufacturers, but also for projects of end users \cite{johnIEC611313Programming2010}.
 \subsection{Program Organization Unit (POU)}
 \label{sub:pou}
-Projects are built of POUs. These organization units are encapsulated, which does not only enable modularization of code, but also independent compilation.
+Projects are built of POUs. These organization units are encapsulated, which does not only modularize code, but also enables independent compilation.
 There are three types of POUs \cite{johnIEC611313Programming2010}:
 \begin{itemize}
-	\item \emph{FBs} (\emph{Functionblock}) are the main building blocks of a program. Functionblocks can be instantiated. They may contain actual state (like a timer or counter). Functionblock types are visibly globally, but instances may be not. Inheritance is not intended.
+	\item \emph{FBs} (\emph{Functionblock}) are the main building blocks of a program. Function blocks can be instantiated. They may contain actual state (like a timer or counter). Function block types are visibly globally, but instances may not be. Inheritance is not intended.
 	\item \emph{Programs} represent the main program. These units are not called explicitly by other POUs, but otherwise behave like FBs.
 	\item \emph{Functions} basically are the same as regular, pure functions. Therefore functions do not contain any state and are not able to call Function Blocks, which may contain side effects. 
 \end{itemize}
@@ -237,11 +237,11 @@ Recursion is not allowed, neither directly nor indirectly.
 
 \subsection{Languages}
 \label{sub:iec-lang}
-The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
+the logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
 \begin{itemize}
 	\item \emph{Instruction List} is an assembly like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
-	\item \emph{Structured Text} is a pascal-like, higher level programming language (see Listing \ref{code:st}).
-	\item \emph{Functionblock Diagram} are partly graphical and partly textual (see Figure \ref{code:fbd}). The language is inspired from the field of signal processing. 
+	\item \emph{Structured Text} is a pascal-like, higher-level programming language (see Listing \ref{code:st}).
+	\item \emph{Function block Diagram} are partly graphical and partly textual (see Figure \ref{code:fbd}). The language is inspired from the field of signal processing. 
 	\item \emph{Ladder Diagram} is a graphical language, mainly used when processing boolean values (see Figure \ref{code:ld}).
 	\item \emph{Sequential Function Chart} is a graphical language, whose goal is to break complex programs into small manageable units (see Figure \ref{code:sfc}). 
 \end{itemize}
@@ -250,13 +250,13 @@ The logic part of POUs may be implemented in one of five distinct programming la
 
 \begin{program}
 	\begin{GenericCode}
-VAR
-	FirstOperand, SecondOperand, Result: INT := 10;
-	StringOp: String[30] := '12345678901234567890';
-	StringRes: String[25];
-END_VAR
-
-B1:	LD FirstOperand (* 10 {INT} *)
+		VAR
+		FirstOperand, SecondOperand, Result: INT := 10;
+		StringOp: String[30] := '12345678901234567890';
+		StringRes: String[25];
+		END_VAR
+		
+		B1:	LD FirstOperand (* 10 {INT} *)
 		ADD SecondOperand (* 20 {INT} *)
 		ST Result (* 20 {INT} *)
 		GT 0 (* TRUE, because 20 > 0 {BOOL} *)
@@ -264,7 +264,7 @@ B1:	LD FirstOperand (* 10 {INT} *)
 		(* jump, because CR=TRUE; present value of CR remains {BOOL} *)
 		JMP FarAway (* CR is not defined or present value: *)
 		(* implementation-dependent *)
-B2: LD StringOp (* 12345678901234567890 {STRING} *)
+		B2: LD StringOp (* 12345678901234567890 {STRING} *)
 		ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
 	\caption{Example Instruction List program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:il}
@@ -272,16 +272,16 @@ B2: LD StringOp (* 12345678901234567890 {STRING} *)
 
 \begin{program}
 	\begin{GenericCode}
-TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
-VAR d: INT;
-	e: ARRAY [0..9] OF INT; 
-	f: REAL;
-	g: MulVar (Var1:=10, Var2 := 2.3); 
-	h: MulVar;
-END_VAR
-d := 10; (* Assignment *)
-e[0] := d ** 2;   h  := g; (* Two assignments in one line *)
-d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode}
+		TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
+		VAR d: INT;
+		e: ARRAY [0..9] OF INT; 
+		f: REAL;
+		g: MulVar (Var1:=10, Var2 := 2.3); 
+		h: MulVar;
+		END_VAR
+		d := 10; (* Assignment *)
+		e[0] := d ** 2;   h  := g; (* Two assignments in one line *)
+		d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode}
 	\caption{Example structured text program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:st}
 \end{program}
@@ -289,7 +289,7 @@ d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode
 \begin{figure}
 	\centering
 	\includegraphics[width=0.7\textwidth]{fbd}
-	\caption{Example functionblock diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\caption{Example function block diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:fbd}
 \end{figure}
 
@@ -310,19 +310,19 @@ d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode
 \section{Satisfiable Modulo Theory}
 \begin{quote}
 	Satisfiability modulo theories (SMT) generalizes boolean satisfiability (SAT) by
-	adding equality reasoning, arithmetic, fixed-size bit-vectors, arrays, quantifiers,
+	adding equality reasoning, arithmetic, fixed-size bit vectors, arrays, quantifiers,
 	and other useful first-order theories. An SMT solver is a tool for deciding the satisfiability (or dually the validity) of formulas in these theories. SMT solvers enable
 	applications such as extended static checking, predicate abstraction, test case generation, and bounded model checking over infinite domains, to mention a few. \cite{demouraZ3EfficientSMT2008}
 \end{quote}
 
-The basis of a SMT-Solver is a SAT-Solver, which solves boolean formulas only. SMT-Solvers may function as a separate program or may be imported as a module/package into a program. 
+The basis of an SMT-Solver is a SAT-Solver, which solves boolean formulas only. SMT-Solvers may function as a separate program or may be imported as a module/package into a program. 
 Popular SMT-Solvers are for example Z3 \cite{demouraZ3EfficientSMT2008}, Princess \cite{princess08}, Yices2 \cite{Dutertre:cav2014} and many more.
 
 \subsection{SMT-LIB}
 SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
 By using the same input and output format SMT-Solvers may be exchanged at any time. 
 This format is a LISP, which has some additional special functions used for direct interaction with the SMT-Solver. Since LISP is a functional programming language, the same characteristics are applied to SMT-Lib.
-For example mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
+For example, mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
 Usually a SMT-LIB programm (see Listing \ref{code:smt-lib}) begins with declaring functions. Variables may also be represented as functions. 
 Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
 The last part contains an instruction for the SMT-Solver to check the satisfiability. 
@@ -331,37 +331,37 @@ SMT-Solvers may also implement the simplification of a given expression.
 
 \begin{program}
 	\begin{LispCode}
-; declaring variables
-(declare-fun x () Int)
-(declare-fun y () Int)
-(declare-fun z () Int)
-
-(push 2) ; push next 2 constraints to stack
-; Add constraint
-(assert (= x y))
-; Add another constraint
-(assert (> y z))
-; Check satisfiability
-(check-sat)
-; => sat
-(push 1) ; push next constraint to stack
-; Add another constraint
-(assert (= z x))
-(check-sat)
-; => unsat
-(pop 1) ; pop last constraint from stack
-(check-sat)
-; => sat
-; get possible values of variables
-(get-value (x y z))
-; => ((x 0)
-;     (y 0)
-;     (z (- 1)))
-(pop 2) ; pop the last 2 constraints
-(push 1) ; push next constraint to the stack
-(assert (and (= x y) (> x z)))
-(check-sat)
-; => sat\end{LispCode}
+		; declaring variables
+		(declare-fun x () Int)
+		(declare-fun y () Int)
+		(declare-fun z () Int)
+		
+		(push 2) ; push next 2 constraints to stack
+		; Add constraint
+		(assert (= x y))
+		; Add another constraint
+		(assert (> y z))
+		; Check satisfiability
+		(check-sat)
+		; => sat
+		(push 1) ; push next constraint to stack
+		; Add another constraint
+		(assert (= z x))
+		(check-sat)
+		; => unsat
+		(pop 1) ; pop last constraint from stack
+		(check-sat)
+		; => sat
+		; get possible values of variables
+		(get-value (x y z))
+		; => ((x 0)
+		;     (y 0)
+		;     (z (- 1)))
+		(pop 2) ; pop the last 2 constraints
+		(push 1) ; push next constraint to the stack
+		(assert (and (= x y) (> x z)))
+		(check-sat)
+		; => sat\end{LispCode}
 	\caption{SMT-Lib example program. Push and pop instructions add or remove the next $n$ assert statements. Checking satisfiability is done by the \emph{check-sat} instruction, returning either \emph{sat} or \emph{unsat}. The \emph{get-value} instruction delivers a possible set of assignments of given variables. }
 	\label{code:smt-lib}
 \end{program}

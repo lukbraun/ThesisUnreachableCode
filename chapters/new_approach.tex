@@ -1,29 +1,29 @@
 %!TEX root = ../main.tex
 
-\chapter{Finding unreachable code using a SMT-Solver}
+\chapter{Finding Unreachable Code Using an SMT-Solver}
 \label{cha:finding unreachable code using a smt-solver}
 
 The developed approach uses the control flow graph as a basis, but does not transform it into single static assignment form.
 During analysis the control flow graph will be traversed and interpreted until every possible execution path was followed and analyzed.
-After each interpretation state (e.g. assignments, path conditions) will be added accordingly and must be taken into account.
+After each interpretation state (e.g., assignments, path conditions) will be added accordingly and must be taken into account.
 Merging state has to be handled correctly to make correct statements about the current value of a variable.
-The state is represented in the form of a predicate, which may be checked by a system capable of determining satisfiability (e.g. an SMT-solver).
+The state is represented in the form of a predicate, which may be checked by a system capable of determining satisfiability (e.g., an SMT-solver).
 Satisfiable results will continue with the next block(s) and using the new state as a basis and flag this block as visitable.
 Unsatisfiable results stop the computation at the current block and will not pursue to continue the path.
 Therefore this method is pessimistic.
-By using this method every error should be found in theory (as described in Chapter \ref{cha:conclusion}), since every instruction will be handled like during execution. 
-This entails barriers such as: 
+By using this method, every error should be found in theory (as described in Chapter \ref{cha:conclusion}), since every instruction will be handled like during execution. 
+This entails barriers such as 
 \begin{itemize}
 	\item Significant increase in time needed for analysis. 
 	\item Possibly exponentially growing expressions to determine satisfiability.
 \end{itemize}
-These problems lead to greater execution time, which requires the implementation of reactions (e.g. early stopping, assuming values for variables in loops).
+These problems lead to greater execution time, which requires the implementation of reactions (e.g., early stopping, assuming values for variables in loops).
 
 \section{Architecture}
 The implementation is part of an already developed static code analysis tool \cite{Prahofer_2012}. 
 It consists of different parsers, forms of representation and a rule executor. 
 As shown in Figure \ref{fig:general architecture} the tool requires IEC source code and a configuration file for the rule executor.
-Basically rules are Java classes which check if the given IEC source code does not violate any conventions or contain bad code smells. 
+Basically, rules are Java classes which check if the given IEC source code does not violate any conventions or contain bad code smells. 
 Some rules collect metrics, such as lines of code, code complexity, nesting level, cohesion and coupling.
 Rules get triggered by certain nodes of the abstract syntax tree, like declarations of variables, function calls, arithmetic expression, et cetera.
 For analysis the rule executor traverses the abstract syntax tree and triggers the specified rules provided in the configuration file.
@@ -38,7 +38,7 @@ The analysis is covered in Section \ref{sec:analysis}.
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{static-code-analysis}
-	\caption{Architectural overview of the static code analysis tool for IEC source code. After parsing IEC source code the AST will be passed to the RuleExecutor, which triggers only the configured rules. For more advanced analysis the AST may be transformed into a different representation. When the source code does not conform to the rules violations will be generated, which can be integrated with Sonarqube.}
+	\caption{Architectural overview of the static code analysis tool for IEC source code. After parsing IEC source code, the AST will be passed to the RuleExecutor, which triggers only the configured rules. For more advanced analysis, the AST may be transformed into a different representation. When the source code does not conform to the rules violations will be generated, which can be integrated with Sonarqube.}
 	\label{fig:general architecture}
 \end{figure}
 
@@ -51,13 +51,13 @@ The analysis is covered in Section \ref{sec:analysis}.
 
 \section{Translation of Functions}
 \label{sec:translation}
-For every function the control flow graph will be calculated and used as basis. 
+For every function the control flow graph will be calculated and used as the basis. 
 Consider the concrete example show in Figure \ref{code:transformation example} as input. 
 After parsing the abstract syntax tree will be generated and then used to build the control flow graph (demonstrated in Figure \ref{fig:ast to cfg}).
-Information about parameters and global-/system variables also need to be provided in order to handle function-/procedure-calls. 
+Information about parameters and global-/system variables also need to be provided in order to handle function-/procedure calls. 
 Two separate procedures will be performed on this control flow graph.
 \begin{enumerate}
-	\item \emph{Unreachable code due to unconditional jumps} is easy to find after the control flow graph was created. Every block (except the begin block) which does not have any incoming edges must be unreachable.
+	\item \emph{Unreachable code due to unconditional jumps} is easy to find after the control flow graph was created. Every block (except the beginning block) which does not have any incoming edges must be unreachable.
 	Note that these types of errors may also be found as described in Section \ref{sec:analysis}, but were filtered out before.
 	\item \emph{Unreachable code due to infeasible conditions} needs a sophisticated and more expensive (in terms of computing resources) approach to identify. The following Section \ref{sec:analysis} describes how to detect them.
 \end{enumerate}
@@ -85,7 +85,7 @@ log($\downarrow$ $x$)\end{GenericCode}
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{ast-to-cfg}
-	\caption{In the first step the abstract syntax tree of a function in listing \ref{code:transformation example} will be translated into the control flow graph.}
+	\caption{In the first step, the abstract syntax tree of a function in listing \ref{code:transformation example} will be translated into the control flow graph.}
 	\label{fig:ast to cfg}
 \end{figure}
 
@@ -96,14 +96,14 @@ The structure of the control flow graph is only one of the necessary components.
 Simplifying instructions makes the overall analysis easier, since each type must be handled differently.
 The internal structure of instructions will also be simplified into an AST like structure (see Figure \ref{fig:cfg to internal}). 
 Note that the previous control flow graph also contained instructions, which simply were references to nodes in the original AST. 
-The new representation contains only the necessary information, which were decoupled from the original AST.
+The new representation contains only the necessary information, which was decoupled from the original AST.
 
-Instructions come in three different types (shown in figure \ref{fig:state}) and must be marked accordingly:
+Instructions come in three different types (shown in Figure \ref{fig:state}) and must be marked accordingly:
 \begin{enumerate}
 	\item \emph{Assignments} are usually the most common form of instructions. They denote a change of the underlying value of a variable and therefore update the state (of said variable) during analysis. 
-	\item \emph{Conditions} occur only as the last instruction of a block from a \emph{Controlflow graph}. Note that the last instruction does not necessarily has to be a \emph{condition}.
-	\item \emph{Procedure calls} may be mutable and could change variables, if they are applied as \emph{output parameters}. % Procedure calls will be dissolved into \emph{assignments} during analysis.
-	For intraprocedural analysis of procedures, output parameters will be dissolved into assignments to simplify the process. Basically it is assumed that out parameters get an undetermined value assigned, which consequently update the state of the variable and may contain any possible value (restricted only by the datatype).
+	\item \emph{Conditions} occur only as the last instruction of a block from a \emph{Controlflow graph}. Note that the last instruction does not necessarily have to be a \emph{condition}.
+	\item \emph{Procedure calls} may be mutable and could change variables if they are applied as \emph{output parameters}. % Procedure calls will be dissolved into \emph{assignments} during analysis.
+	For intraprocedural analysis of procedures, output parameters will be dissolved into assignments to simplify the process. Basically, it is assumed that out parameters get an undetermined value assigned, which consequently update the state of the variable and may contain any possible value (restricted only by the datatype).
 \end{enumerate}
 \begin{figure}
 	\centering
@@ -119,7 +119,7 @@ Instructions come in three different types (shown in figure \ref{fig:state}) and
 \end{figure}
 
 % AST-Object representation of instructions
-Every Instruction will also be represented in an AST-like notation as shown in Figure \ref{fig:smtobject}. Each symbol, for example a variable, name of a function or any given literal (such as numbers and strings), are represented as an \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure calls, but also operations (like + and -). User-defined functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since named parameters are a language feature of IEC and therefore must be handled correctly), which will be represented as \emph{BaseObjects}. 
+Every instruction will also be represented in an AST-like notation as shown in Figure \ref{fig:smtobject}. Each symbol, for example a variable, name of a function or any given literal (such as numbers and strings), are represented as a \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure calls, but also operations (like + and -). User-defined functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since named parameters are a language feature of IEC and therefore must be handled correctly), which will be represented as \emph{BaseObjects}. 
 This kind of representation makes it easy to work with, since it is a very easy, tree-like data structure which may be traversed easily. Not only replacing variables and values may be done effortlessly, but also the generation of \emph{SMT-Lib} code, since this representation is similar to \emph{LISP}.
 
 \begin{figure}
@@ -130,10 +130,10 @@ This kind of representation makes it easy to work with, since it is a very easy,
 \end{figure}
 \section{Analysis}
 \label{sec:analysis}
-After the translation of all functions and instructions the analysis begins. As mentioned in the introduction of this chapter the control flow graph of every function (and procedure) will be traversed. The analysis begins at the single begin block of the graph and ends, when all feasible paths reached the exit block. Instruction blocks will be evaluated in order - the same as a program would execute them. 
-For each instruction block the instructions will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an instruction block a SMT-solver is used to determine if the current state is feasible or not. Infeasible state may be reached by a combination of conditions. If the current state is infeasible, the \emph{next} block must be unreachable, since the condition at the end of an instruction block determines which branch the flow follows. 
+After the translation of all functions and instructions the analysis begins. As mentioned in the introduction of this chapter the control flow graph of every function (and procedure) will be traversed. The analysis begins at the single begin block of the graph and ends when all feasible paths reached the exit block. Instruction blocks will be evaluated in order - the same as a program would execute them. 
+For each instruction block the instructions will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an instruction block an SMT-solver is used to determine if the current state is feasible or not. Infeasible state may be reached by a combination of conditions. If the current state is infeasible, the \emph{next} block must be unreachable, since the condition at the end of an instruction block determines which branch the flow follows. 
 For the determination, if the current state is feasible or not, the SMT-solver Z3 \cite{demouraZ3EfficientSMT2008} is used. The state will be simply translated into the universal, standardized, LISP-like SMT-Lib language \ref{code:translation} which most of the common SMT-solvers are able to interpret. 
-If an instruction block is reachable (at least on one occasion) it will be marked as reachable. At the end of the analysis all remaining instruction blocks are marked unreachable.
+If an instruction block is reachable (at least on one occasion), it will be marked as reachable. At the end of the analysis all remaining instruction blocks are marked unreachable.
 
 \begin{program}
 	\begin{GenericCode}
