@@ -1,3 +1,12 @@
 \chapter{Kurzfassung}
-\emph{1 Site}
 
+\begin{german}
+In dieser Arbeit geht es um die Erkennung von unerreichbarem Code im Quellcode. Diese Art von Fehlern tritt in zwei Formen auf, entweder aufgrund von unbedingten Sprüngen mit Hilfe von imperativen Anweisungen, was leicht zu erkennen ist, oder aufgrund von undurchführbaren Bedingungen, was schwieriger zu erkennen ist, da ein breiterer Kontext erforderlich ist, um die Durchführbarkeit zu bestimmen.
+
+
+Unerreichbarer Code wird nicht nur durch spezielle statische Code-Analyse-Tools überprüft, sondern auch durch den Compiler oder eine integrierte Entwicklungsumgebung. Es gibt viele Lösungen für verschiedene Programmiersprachen, die jedoch nicht in gleichem Maße auf unerreichbaren Code prüfen. So stellen Compiler normalerweise nicht einmal unerreichbaren Code fest, andere sind so konzipiert, dass sie nicht einmal kompilieren, wenn unerreichbarer Code auftritt (z. B. javac).
+
+
+In dieser Arbeit wurde diese Prüfung in eine bestehende statische Codeanalyse eingeführt, die auf strukturierten Text abzielt, eine Pascal-ähnliche Sprache, die in der Norm IEC-61131-3 enthalten ist. Diese Analyse erfordert die Darstellung des Programms in Form eines Kontrollflussgraphen und vereinfacht das Durchlaufen jedes Pfades. Der Kontext enthält mögliche Werte für jede Variable in Form von Prädikaten. Diese Prädikate können von einem SMT-Solver auf Machbarkeit geprüft werden, der in der Lage ist, mögliche konkrete Werte für jede Variable zu bestimmen. 
+
+\end{german}

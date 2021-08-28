@@ -1,7 +1,10 @@
 \chapter{Abstract}
+\label{cha:abstract}
+
+This thesis is about the detection of unreachable code in source code. This type of error occurs in two forms, either due to unconditional jumps using imperative statements, which is easily detected, or due to infeasible conditions, which is harder to detect, since a broader context is needed to determine feasibility.
 
 
-\begin{english} %switch to English language rules
-\emph{1 Site}
-\end{english}
+Unreachable code is not only checked by specific static code analysis tools, but also in provided as a check by the compiler or an integrated development environment. Many solutions for different programming languages exist, but do not check unreachable code to the same extent. For example compilers usually do not even determine unreachable code, others are designed to not even compile when unreachable code is encountered (e.g. javac).
 
+
+In this thesis this check was introduced to an existing static code analysis, which targets structured text, a pascal-like language included in the IEC-61131-3 standard. This analysis requires to represent the program in form of a control flow graph and simplifies passing every path. The context contains possible values for every variable in form of predicates. These predicates may be checked for feasibility by a SMT-solver, which is able to determine possible concrete values for each variable. 

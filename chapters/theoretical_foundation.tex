@@ -318,7 +318,7 @@ d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode
 The basis of a SMT-Solver is a SAT-Solver, which solves boolean formulas only. SMT-Solvers may function as a separate program or may be imported as a module/package into a program. 
 Popular SMT-Solvers are for example Z3 \cite{demouraZ3EfficientSMT2008}, Princess \cite{princess08}, Yices2 \cite{Dutertre:cav2014} and many more.
 
-\subsection{SMT-LIB \textasciitilde 1 sites}
+\subsection{SMT-LIB}
 SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
 By using the same input and output format SMT-Solvers may be exchanged at any time. 
 This format is a LISP, which has some additional special functions used for direct interaction with the SMT-Solver. Since LISP is a functional programming language, the same characteristics are applied to SMT-Lib.

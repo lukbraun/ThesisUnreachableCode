@@ -150,8 +150,7 @@ procedure $mergeState$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
 		// add the new instruction to the state
 		$state.add($$\downarrow$ $instruction$$)$
 	end 
-end		
-	\end{GenericCode}
+end	\end{GenericCode}
 	\caption{Merges the new instruction into the existing state. While conditions simply may be added, assignments alter the state, since the concrete value changes and former state can no longer be associated with this variable. }
 \label{code:merge state}
 \end{program}
@@ -160,8 +159,7 @@ end
 function $solve$($\downarrow$ $state$) begin
 	// translate state to SMT-String and pass to Z3
 	return $Z3.solve($$\downarrow$ $state.toSMTString())$
-end
-	\end{GenericCode}
+end\end{GenericCode}
 	\caption{The form (see figure \ref{fig:smtobject}) all instructions are represented in makes the generation of SMTLib code easy. The string containing SMTLib code will simply be passed to the solver directly.}
 \label{code:z3 solver}
 \end{program}
@@ -172,8 +170,7 @@ procedure $resolveFunctionCalls$($\downarrow$ $instruction$, $\updownarrow$ $sta
 	// simply remove all variables, which may change.
 	$outParams$ $\leftarrow$ $instructions.getOutParams()$
 	$state.removeState($$\downarrow$ $outParams$$)$
-end		
-	\end{GenericCode}
+end	\end{GenericCode}
 	\caption{Function calls will be handled in an intra-procedural manner. This is simply realized by just removing any state containing a variable which may change and will be handled like an assignment, whereas the new value is unknown. }
 	\label{code:intraprocedural analysis}
 \end{program}
@@ -198,8 +195,7 @@ procedure $analyze$ ($\downarrow$ $instructionBlock$, $\downarrow$ $oldState$) b
 		// By following the else-branches last instruction, if it was a condition, must be negated
 		$analyze$($\downarrow$ $instructionBlock.getElseBranch()$,$\downarrow$ $newState.negateLastInstruction()$)
 	end
-end	
-	\end{GenericCode}
+end	\end{GenericCode}
 
 	\caption{The main component of the unreachable code detection is the analysis of instruction blocks. Beginning with no state set it will be added subsequently by traversing the control flow graph and adding accumulated state. 
 	At first the current state must be checked for feasibility. Only if it is feasible (see Listing \ref{code:z3 solver}) this the instruction block can be marked as reachable and new instructions may be added to the state as described in Listing \ref{code:merge state} and Listing \ref{code:intraprocedural analysis}.	
@@ -214,24 +210,21 @@ $i$ $\leftarrow$ 1
 $x$ $\leftarrow$ 5
 if $i$ < $x$ then 
 	// ...
-end
-	\end{GenericCode}
+end\end{GenericCode}
 	\begin{GenericCode}
 ;; Check if condition evaluates TRUE
 (declare-fun x () Real)
 (declare-fun i () Real)
 (assert (and (= i 1) (= x 5) (< i x)))
 (check-sat)
-; => SAT
-	\end{GenericCode}
+; => SAT\end{GenericCode}
 	\begin{GenericCode}
 ;; Check if condition evaluates FALSE	
 (declare-fun x () Real)
 (declare-fun i () Real)
 (assert (and (= i 1) (= x 5) (not (< i x))))
 (check-sat)
-; => UNSAT
-	\end{GenericCode}
+; => UNSAT\end{GenericCode}
 	\caption{Translation of the IEC-Code. As shown above, each variable must be declared beforehand (therefore the implementation must be aware of the type). The assertion includes the complete state (including assignments and conditions). Conditions are the only part which could lead to an unfeasible result. Every Instruction-Block must contain at least one edge out of the block (with the exception of the exit block), but may also contain a second edge, indicating the path of a condition evaluates false. Therefore the condition must be negated.}
 	\label{code:translation}
 \end{program}
@@ -275,8 +268,7 @@ The last example show in Figure \ref{fig:unconditionalJump} shows an example con
 	\begin{GenericCode}
 $x$ $\leftarrow$ 1
 $x$ $\leftarrow$ $x$ + 1
-$i$ $\leftarrow$ $x$
-	\end{GenericCode}
+$i$ $\leftarrow$ $x$\end{GenericCode}
 	\centering
 	\includegraphics[width=0.3\textwidth]{assignments-only-cfg}
 	\includegraphics[width=0.3\textwidth]{assignments-only}
@@ -290,8 +282,7 @@ if $x$ = 2 then
 	y $\leftarrow$ true
 else
 	y $\leftarrow$ false
-end
-	\end{GenericCode}
+end\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{simple-if-cfg}
 	\includegraphics[width=0.4\textwidth]{simple-if}
@@ -303,8 +294,7 @@ end
 	\begin{GenericCode}
 for $i$ $\leftarrow$ 0..$x$ do
 	$y$ $\leftarrow$ $i$ + $x$
-end		
-	\end{GenericCode}
+end	\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{simple-loop-cfg}
 	\includegraphics[width=0.4\textwidth]{simple-loop}
@@ -319,8 +309,7 @@ while $i$ < 10 do
 	$i$ $\leftarrow$ 2
 	break
 	$i$ $\leftarrow$ 3
-end
-	\end{GenericCode}
+end\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{unconditional-jump-cfg}
 	\includegraphics[width=0.4\textwidth]{unconditional-jump}
