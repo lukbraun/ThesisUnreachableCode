@@ -29,7 +29,7 @@ The causes may either be due to:
 \end{enumerate}
 
 
-\begin{program}
+\begin{program}[h!]
 	\begin{CppCode}
 		int unreachable_code_goto() {
 			int x = 42;
@@ -103,7 +103,7 @@ It is important to note that according to this definition dead code may be reach
 
 % Unused statements, methods, variables (?)
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 		public class DeadCode {
 			public static int unusedVariable() {
@@ -142,7 +142,7 @@ Some standards, like MITRE-CWE \cite{CWECWE561Dead} define dead code as follows:
 This definition does not have anything in common with the one provided before. According to this standard, dead code is unreachable code, since it cannot be executed. But unnecessary assignments are not considered dead code, but has its own category \emph{Assignment to Variable Without Use}.
 Both of these issues are considered as \emph{Irrelevant Code}.
 
-
+\pagebreak
 In contrast the standard MISRA-C \cite{motorindustrysoftwarereliabilityassociationMISRAC2004Guidelines2008} defines unreachable code as follows:
 \begin{quote}
 	Rule 14.1 (required): There shall be no unreachable code.
@@ -168,7 +168,7 @@ Infeasible code only occurs due to conditions which always evaluate to false. An
 Infeasible code may occur either due to conditions which only consist of boolean literals (and expressions), constants, or as consequence of former conditions, as demonstrated in Listing \ref{code:infeasible code}.
 
 Infeasible code is a subset of unreachable code.
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 		public class InfeasibleCode {
 			public static void infeasibleConstant() {
@@ -217,6 +217,7 @@ The standard is maintained by the independent organization PLCOpen \cite{eldijkW
 
 
 The standard does not only provide guidelines for manufacturers, but also for projects of end users \cite{johnIEC611313Programming2010}.
+\pagebreak
 \subsection{Program Organization Unit (POU)}
 \label{sub:pou}
 Projects are built of POUs. These organization units are encapsulated, which does not only modularize code, but also enables independent compilation.
@@ -248,7 +249,7 @@ The logic part of POUs may be implemented in one of five distinct programming la
 % \subsection{Variables}
 
 
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 		VAR
 		FirstOperand, SecondOperand, Result: INT := 10;
@@ -270,7 +271,7 @@ The logic part of POUs may be implemented in one of five distinct programming la
 	\label{code:il}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 		TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
 		VAR d: INT;
@@ -286,26 +287,29 @@ The logic part of POUs may be implemented in one of five distinct programming la
 	\label{code:st}
 \end{program}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{fbd}
 	\caption{Example function block diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:fbd}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{ld}
 	\caption{Example ladder diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:ld}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.4\textwidth]{sfc}
 	\caption{Example sequential function chart diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:sfc}
 \end{figure}
+
+\clearpage
+\pagebreak
 
 \section{Satisfiable Modulo Theory}
 
@@ -332,7 +336,7 @@ The last part contains an instruction for the SMT-Solver to check the satisfiabi
 Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
 SMT-Solvers may also implement the simplification of a given expression.
 
-\begin{program}
+\begin{program}[h!]
 	\begin{LispCode}
 		; declaring variables
 		(declare-fun x () Int)

@@ -3,7 +3,7 @@
 \chapter {Evaluation}
 \label {cha:evaluation}
 This chapter contains interesting IEC functions and procedures, either found in production code or collected and translated from literature.
-Each example provides the code, the control flow graph, a description and some metrics, like execution time, number of instruction blocks needed to conclude the result and, most importantly, the reported violations.
+Each example provides the code, the control flow graph, a description and some metrics, like execution time (median, minimum and maximum of 100 runs), number of instruction blocks needed to conclude the result and, most importantly, the reported violations.
 
 
 \section{Basic Example}
@@ -13,18 +13,23 @@ As described at Figure \ref{code:basic example 1}, basic block 11 is not reachab
 Even though a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
 The idea of the implementation originated from this example.
 
-Metrics:
-\begin{itemize}
-	\item Runtime: 581 ms
-	\item Number of analyzed instruction blocks: 17
-	\item Violations: block 11
-\end{itemize}
+% Metrics:
+%\begin{itemize}
+%	\item Runtime:
+%	\begin{itemize}
+%		\item Median: 24.29 ms
+%		\item Minimum: 21 ms
+%		\item Maximum: 31 ms
+%	\end{itemize}
+%	\item Number of analyzed instruction blocks: 17
+%	\item Violations: block 11
+%\end{itemize}
 
 % 581ms
 % 17 Blöcke analysiert
 % Violation für block 11
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 IF s_operationHour <> m_operationHour THEN
 	m_operationHour := s_operationHour;
@@ -51,36 +56,46 @@ END_IF;	\end{GenericCode}
 	\label{code:basic example 1 cfg}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{minimal-example}
 	\caption{Analysis of example \ref{code:basic example 1 cfg}. }
 	\label{code:basic example 1}
 \end{figure}
-
+\clearpage
+\pagebreak
 \section{Loops}
 The main consequence of the implementation is significantly greater execution time, especially, when loops are present.
 The following examples contain an almost identical algorithm. The only difference is that the first example in figure \ref{code:loop example 1 cfg} has a set value for x, whereas the example in figure \ref{code:loop example 2 cfg} does not have a limitation. Therefore basic block 6 is not reachable in the first example in figure \ref{code:loop example 1}, but may be reachable for the second example in figure \ref{code:loop example 2}.
 
 
-Metrics (Example 1):
-\begin{itemize}
-	\item Runtime: 61 ms
-	\item Number of analyzed instruction blocks: 20
-	\item Violations: block 6
-\end{itemize}
+%Metrics (Example 1):
+%\begin{itemize}
+%	\item Runtime:
+%	\begin{itemize}
+%		\item Median: 23.69 ms
+%		\item Minimum: 22 ms
+%		\item Maximum: 34 ms
+%	\end{itemize}
+%	\item Number of analyzed instruction blocks: 20
+%	\item Violations: block 6
+%\end{itemize}
 
 
 
-Metrics (Example 2):
-\begin{itemize}
-	\item Runtime: <1 ms
-	\item Number of analyzed instruction blocks: 68
-	\item Violations: none
-\end{itemize}
+%Metrics (Example 2):
+%\begin{itemize}
+%	\item Runtime:
+%	\begin{itemize}
+%		\item Median: 1.07 ms
+%		\item Minimum: <1 ms
+%		\item Maximum: 2 ms
+%	\end{itemize}
+%	\item Number of analyzed instruction blocks: 68
+%	\item Violations: none
+%\end{itemize}
 
-
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 i := 1;
 x := 5;
@@ -100,13 +115,13 @@ END_IF;	\end{GenericCode}
 	\caption{The variable i will change inside the loop. As long as x is not equal to 3, the basic block 6 is unreachable. }
 	\label{code:loop example 1 cfg}
 \end{figure}
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.6\textwidth]{basic-while}
 	\caption{Analysis of example \ref{code:loop example 1 cfg}. }
 	\label{code:loop example 1}
 \end{figure}
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 i := 1;
 		
@@ -125,27 +140,32 @@ END_IF;		\end{GenericCode}
 	\caption{Same as \ref{code:loop example 1}, but x is an input variable. Therefore it may be 3, so it could be reachable.}
 	\label{code:loop example 2 cfg}
 \end{figure}
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{basic-while-input}
 	\caption{Analysis of example \ref{code:loop example 2 cfg}.}
 	\label{code:loop example 2}
 \end{figure}
-\section{Function- and Procedure-Calls}
+\section{Function and Procedure Calls}
 This example in Listing \ref{code:func test 1} demonstrates the handling of function- and procedure calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
 As described in Section, \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
 Due to these circumstances, basic blocks 5 and 9 are not reachable.
 
 
-Metrics:
-\begin{itemize}
-	\item Runtime: 169 ms
-	\item Number of analyzed instruction blocks: 31
-	\item Violations: block 5
-\end{itemize}
+%Metrics:
+%\begin{itemize}
+%	\item Runtime:
+%	\begin{itemize}
+%		\item Median: 537 ms
+%		\item Minimum: 492 ms
+%		\item Maximum: 841 ms
+%	\end{itemize}
+%	\item Number of analyzed instruction blocks: 31
+%	\item Violations: block 5
+%\end{itemize}
 
 
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 tmp1 := 1;
 tmp2 := 2;
@@ -179,13 +199,13 @@ END_IF;	\end{GenericCode}
 	\caption{Demonstrates intraprocedural analysis. The procedure  FooOutput declares the first parameter as an IN parameter and therefore has no effect on the variable, while the other two parameters are declared as OUT parameters and might change. Note that the analysis does not check if the out parameter will be mutated, so it will be counted as if it would have. ABFunc is an instantiated algorithm block, which is similar to a class, and declares the parameters of the procedure \emph{algo1} in the same order. Note that the second occurrence of this method call contains named parameters. \emph{out1} and \emph{in\_out3} may be mutated.}
 	\label{code:func test 1}
 \end{program}
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{easy-func-test-cfg}
 	\caption{Control flow graph of example \ref{code:func test 1}}
 	\label{fig:func test 1 cfg}
 \end{figure}
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{easy-func-test}
 	\caption{Analysis of example \ref{fig:func test 1 cfg}.}
@@ -200,14 +220,19 @@ Note that the loop contains a variable which does not change, which will never s
 If the condition would have been different, it is easier to detect, but since this example has been used by different sources it was not altered.
 
 
-Metrics:
-\begin{itemize}
-	\item Runtime: 20 ms
-	\item Number of analyzed instruction blocks: 47
-	\item Violations: block 4
-\end{itemize}
+%Metrics:
+%\begin{itemize}
+%	\item Runtime:
+%	\begin{itemize}
+%		\item Median: 26.84 ms
+%		\item Minimum: 25 ms
+%		\item Maximum: 34 ms
+%	\end{itemize}
+%	\item Number of analyzed instruction blocks: 47
+%	\item Violations: block 4
+%\end{itemize}
 
-\begin{figure}
+\begin{figure}[hbt!]
 	\begin{GenericCode}
 x := 1;
 	
@@ -226,11 +251,29 @@ END_REPEAT;	\end{GenericCode}
 	\caption{This procedure cannot be analyzed correctly and will not report that basic block 4 is unreachable. }
 	\label{code:hard example 1}
 \end{figure}
-\begin{figure}
+\begin{figure}[hbt!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{hard-example}
 	\caption{Analysis of example \ref{code:hard example 1 cfg}.}
 	\label{code:hard example 1 cfg}
 \end{figure}
+
+\section{Overview of results}
+In Table \ref{tab:runtime-overview} the runtime of each example can be compared to others. Interestingly the number of analyzed block does have a direct effect on runtime. Less restrictions result in less execution time. Handling of function and procedure calls is tedious, because the information of the called function/procedure takes time. In this implementation all functions and procedures are stored in a database and each for each call in the source code the information has to be looked up.
+
+\begin{table}
+\begin{tabular}{lcccc}
+	Example                      & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Median\\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Minimum \\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Maximum\\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}\# \\ of analyzed blocks\end{tabular}} \\
+	\hline
+	Basic Example                & 23ms                                                                         & 21ms                                                                           & 31ms                                                                          & 17                                                                                   \\
+	Loops (No Input Variable)    & 23ms                                                                         & 22ms                                                                           & 34ms                                                                          & 20                                                                                   \\
+	Loops (With Input Variable)  & 1ms                                                                          & \textless{}1ms                                                                 & 2ms                                                                           & 68                                                                                   \\
+	Function and Procedure Calls & 511ms                                                                        & 492ms                                                                          & 841ms                                                                         & 31                                                                                   \\
+	Hard Example                 & 26ms                                                                         & 25ms                                                                           & 34ms                                                                          & 47                                                                                  
+\end{tabular}
+	\caption{Overview of the tested examples and their minimum, maximum and median runtime. One hundred runs per example were executed.}
+	\label{tab:runtime-overview}
+\end{table}
+
 
 

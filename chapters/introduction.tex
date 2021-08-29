@@ -25,7 +25,7 @@ It is often confused with dead code.
 Analyzing these kinds if defects requires the program to be represented in form of a \emph{control flow graph} \ref{fig:cfg}.
 
 
-\begin{program}
+\begin{program}[h!]
     \begin{GenericCode}
 IF s_operationHour <> m_operationHour THEN
     m_operationHour := s_operationHour;
@@ -48,7 +48,7 @@ END_IF;\end{GenericCode}
     \caption{A minimal example containing unreachable code due to unsatisfiable conditions. The condition in line 15 is never reachable, since this case was already handeld in line 1 and the state of that variable did not change.}
     \label{code:ex1}
 \end{program}
-\begin{figure}
+\begin{figure}[h!]
   \centering
   \includegraphics[width=1\textwidth]{minimal-example-cfg}
   \caption{The constructed control flow graph of Listing \ref{code:ex1}. Edges are marked either with then, describing the path if the condition results true, or else. Loops (and sometimes gotos) may easily be spotted since it is the only possibility for arrows pointing to former nodes.}
@@ -63,7 +63,8 @@ This thesis is written as a part of a research project between the \emph{Softwar
 Engel produces injection molding machines, which are programmed using the \emph{Kemro-IEC} language, a dialect of the \emph{IEC 61131-3} standard language.
 The project began as a joint work between the \emph{Software Competence Center Hagenberg} and the \emph{Johannes Kepler University Linz} \cite{jku, Prahofer_2012} within the competence centers program COMET of the Austrian Research Promotion Agency (FFG).
 Over the years multiple rules identifying a wide range of errors were implemented, for example detecting unguarded division, where the divisor could potentially be zero, finding unused variables, highlighting high complexity of expressions, detecting dead code and other defects.
-
+\clearpage
+\pagebreak
 \section{Objective of this thesis}
 \label{sec:objective}
 % Currently a rule for detecting unreachable Code is already in place, but is incomplete.

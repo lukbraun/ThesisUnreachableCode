@@ -34,7 +34,7 @@ When rules are not met, violations will be generated. They contain position, cau
 The detection of unreachable code will be implemented in form of a rule as seen in Figure \ref{fig:unreachable-architecture-overview}, the next Section \ref{sec:translation} covers the translation from the abstract syntax tree to a general control flow graph. 
 Afterwards the instructions within the control flow graph will be transformed as described in Section \ref{subsec:translate instructions}.
 The analysis is covered in Section \ref{sec:analysis}.
-
+\pagebreak
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{static-code-analysis}
@@ -62,7 +62,7 @@ Two separate procedures will be performed on this control flow graph.
 	\item \emph{Unreachable code due to infeasible conditions} needs a sophisticated and more expensive (in terms of computing resources) approach to identify. The following Section \ref{sec:analysis} describes how to detect them.
 \end{enumerate}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 $x$ $\leftarrow$ 3
 $y$ $\leftarrow$ 0
@@ -82,14 +82,15 @@ log($\downarrow$ $x$)\end{GenericCode}
 	\label{code:transformation example}
 \end{program}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{ast-to-cfg}
 	\caption{In the first step, the abstract syntax tree of a function in listing \ref{code:transformation example} will be translated into the control flow graph.}
 	\label{fig:ast to cfg}
 \end{figure}
 
-
+\clearpage
+\pagebreak
 \subsection{Translation of Instructions}
 \label{subsec:translate instructions}
 The structure of the control flow graph is only one of the necessary components. 
@@ -105,37 +106,39 @@ Instructions come in three different types (shown in Figure \ref{fig:state}) and
 	\item \emph{Procedure calls} may be mutable and could change variables if they are applied as \emph{output parameters}. % Procedure calls will be dissolved into \emph{assignments} during analysis.
 	For intraprocedural analysis of procedures, output parameters will be dissolved into assignments to simplify the process. Basically, it is assumed that out parameters get an undetermined value assigned, which consequently update the state of the variable and may contain any possible value (restricted only by the datatype).
 \end{enumerate}
-\begin{figure}
+
+% AST-Object representation of instructions
+Every instruction will also be represented in an AST-like notation as shown in Figure \ref{fig:smtobject}. Each symbol, for example a variable, name of a function or any given literal (such as numbers and strings), are represented as a \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure calls, but also operations (like + and -). User-defined functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since named parameters are a language feature of IEC and therefore must be handled correctly), which will be represented as \emph{BaseObjects}. 
+This kind of representation makes it easy to work with, since it is a very easy, tree-like data structure which may be traversed easily. Not only replacing variables and values may be done effortlessly, but also the generation of \emph{SMT-Lib} code, since this representation is similar to \emph{LISP}.
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.85\textwidth]{State}
 	\caption{Each instruction in any program may be either represented as an \emph{Assignment}, \emph{Condition} or \emph{ProcedureCall} which encapsulates the expression of types described in Figure \ref{fig:smtobject}. Instructions are processed into a \emph{BaseObject} during evaluation. \emph{Conditions} and \emph{ProcedureCalls} simply contain the expression, whereas \emph{Assignments} separate the left side (the receiving variable) and its concrete value on the right side.}
 	\label{fig:state}
 \end{figure}
-\begin{figure}
+\begin{figure}[hbt!]
 	\centering
 	\includegraphics[width=1\textwidth]{cfg-to-internal}
 	\caption{The instructions contained in the control flow graph (created before as described in Figure \ref{fig:ast to cfg}) change their representation into a simpler form. As demonstrated in Figure \ref{fig:state} all instructions are either assignments, conditions or procedure calls. Furthermore the concrete instructions are also represented simpler as described in Figure \ref{fig:smtobject}. }
 	\label{fig:cfg to internal}
 \end{figure}
 
-% AST-Object representation of instructions
-Every instruction will also be represented in an AST-like notation as shown in Figure \ref{fig:smtobject}. Each symbol, for example a variable, name of a function or any given literal (such as numbers and strings), are represented as a \emph{BaseObject}. Functions are, in fact, just a special form of this \emph{BaseObject}, which may contain variables. Functions are not only direct function-/procedure calls, but also operations (like + and -). User-defined functions will also be represented as a special form of the described \emph{FunctionObject} before, which contain the declaration of parameters (since named parameters are a language feature of IEC and therefore must be handled correctly), which will be represented as \emph{BaseObjects}. 
-This kind of representation makes it easy to work with, since it is a very easy, tree-like data structure which may be traversed easily. Not only replacing variables and values may be done effortlessly, but also the generation of \emph{SMT-Lib} code, since this representation is similar to \emph{LISP}.
-
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.2\textwidth]{SMTObject}
 	\caption{\emph{AST}-like representation of instructions. }
 	\label{fig:smtobject}
 \end{figure}
+\clearpage
+\pagebreak
 \section{Analysis}
 \label{sec:analysis}
 After the translation of all functions and instructions the analysis begins. As mentioned in the introduction of this chapter the control flow graph of every function (and procedure) will be traversed. The analysis begins at the single begin block of the graph and ends when all feasible paths reached the exit block. Instruction blocks will be evaluated in order - the same as a program would execute them. 
 For each instruction block the instructions will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an instruction block an SMT-solver is used to determine if the current state is feasible or not. Infeasible state may be reached by a combination of conditions. If the current state is infeasible, the \emph{next} block must be unreachable, since the condition at the end of an instruction block determines which branch the flow follows. 
-For the determination, if the current state is feasible or not, the SMT-solver Z3 \cite{demouraZ3EfficientSMT2008} is used. The state will be simply translated into the universal, standardized, LISP-like SMT-Lib language \ref{code:translation} which most of the common SMT-solvers are able to interpret. 
-If an instruction block is reachable (at least on one occasion), it will be marked as reachable. At the end of the analysis all remaining instruction blocks are marked unreachable.
-
-\begin{program}
+For the determination, if the current state is feasible or not, the SMT-solver Z3 \cite{demouraZ3EfficientSMT2008} is used. The state will be simply translated into the universal, standardized, LISP-like SMT-Lib language \ref{code:translation} which most of the common SMT-solvers are able to interpret. If an instruction block is reachable (at least on one occasion), it will be marked as reachable. At the end of the analysis all remaining instruction blocks are marked unreachable.
+\clearpage
+\pagebreak
+\begin{program}[h!]
 	\begin{GenericCode}
 procedure $mergeState$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
 	if $instruction.isCondition()$ then
@@ -154,7 +157,7 @@ end	\end{GenericCode}
 	\caption{Merges the new instruction into the existing state. While conditions simply may be added, assignments alter the state, since the concrete value changes and former state can no longer be associated with this variable. }
 \label{code:merge state}
 \end{program}
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 function $solve$($\downarrow$ $state$) begin
 	// translate state to SMT-String and pass to Z3
@@ -163,7 +166,7 @@ end\end{GenericCode}
 	\caption{The form (see figure \ref{fig:smtobject}) all instructions are represented in makes the generation of SMTLib code easy. The string containing SMTLib code will simply be passed to the solver directly.}
 \label{code:z3 solver}
 \end{program}
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 procedure $resolveFunctionCalls$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
 	// intra-procedural aprroach:
@@ -174,7 +177,7 @@ end	\end{GenericCode}
 	\caption{Function calls will be handled in an intra-procedural manner. This is simply realized by just removing any state containing a variable which may change and will be handled like an assignment, whereas the new value is unknown. }
 	\label{code:intraprocedural analysis}
 \end{program}
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 procedure $analyze$ ($\downarrow$ $instructionBlock$, $\downarrow$ $oldState$) begin
 	$newState$ $\leftarrow$ $oldState$
@@ -204,7 +207,7 @@ end	\end{GenericCode}
 \end{program}
 
 % TODO: add example for translation
-\begin{program}
+\begin{program}[h!]
 	\begin{GenericCode}
 $i$ $\leftarrow$ 1
 $x$ $\leftarrow$ 5
@@ -228,7 +231,8 @@ end\end{GenericCode}
 	\caption{Translation of the IEC-Code. As shown above, each variable must be declared beforehand (therefore the implementation must be aware of the type). The assertion includes the complete state (including assignments and conditions). Conditions are the only part which could lead to an unfeasible result. Every Instruction-Block must contain at least one edge out of the block (with the exception of the exit block), but may also contain a second edge, indicating the path of a condition evaluates false. Therefore the condition must be negated.}
 	\label{code:translation}
 \end{program}
-
+\clearpage
+\pagebreak
 \subsection{Interpretation of Instructions}
 \label{sub:Interpretation of Instructions}
 % Handling of and state management
@@ -264,7 +268,7 @@ This is the reason why so many branches will be created, which will have a negat
 
 The last example show in Figure \ref{fig:unconditionalJump} shows an example containing an unconditional jump in a loop. There are no incoming edges into BasicBlock 4, which indicates that these statements of this basic block are unreachable.
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 $x$ $\leftarrow$ 1
 $x$ $\leftarrow$ $x$ + 1
@@ -276,7 +280,7 @@ $i$ $\leftarrow$ $x$\end{GenericCode}
 	\label{fig:assignmentOnly}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 if $x$ = 2 then 
 	y $\leftarrow$ true
@@ -290,7 +294,7 @@ end\end{GenericCode}
 	\label{fig:simpleIf}	
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 for $i$ $\leftarrow$ 0..$x$ do
 	$y$ $\leftarrow$ $i$ + $x$
@@ -302,7 +306,7 @@ end	\end{GenericCode}
 	\label{fig:simpleLoop}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\begin{GenericCode}
 $i$ $\leftarrow$ 1
 while $i$ < 10 do
@@ -316,7 +320,8 @@ end\end{GenericCode}
 	\caption{Instruction block 4 is not reachable, since the flow was interrupted by an unconditional jump.}
 	\label{fig:unconditionalJump}
 \end{figure}
-
+\clearpage
+\pagebreak
 \subsection{Early stopping}
 \label{sub:early stopping}
 Ideally, there is an infinite amount of time available for the analysis. Realistically this is impossible to accomplish, therefore mechanisms to stop the computation early must be implemented.
@@ -343,7 +348,6 @@ This approach is definitely lighter on resources (in contrast to interprocedural
 \label{sub:problems and barriers}
 Especially the evaluation of loops is not gentle on resources and processing power. The number of blocks to evaluate grows exponentially. Naturally loops are very common. In theory this approach could find every instance of unreachable code, only limited by available resources. Multiple strategies described before in Section \ref{sub:early stopping} may be applied to reduce the number of iterations.
 The consequences of these strategies are, that not every instance of unreachable code can be detected, making this method not necessarily superior to the traditionally implemented approach.
-It may be possible to use some sort of preprocessing and potentially make it possible to evaluate loops only once, which could reduce the execution time drastically.
+It may be possible to use some sort of preprocessing and make it to evaluate loops only once, which could reduce the execution time drastically.
 The implementation of such a form of preprocssing must take mutations into account and ideally guarantee the same accuracy.
-Without any preprocessing interprocedural analysis of function-/procedure calls may also increase execution time significantly, since they must be interpreted as well. Here also some sort of preprocessing would be interesting. 
-Recursive functions (directly and indirectly) would also lead to an increase of execution time.
+Without any preprocessing interprocedural analysis of function-/procedure calls may also increase execution time significantly, since they must be interpreted as well. 

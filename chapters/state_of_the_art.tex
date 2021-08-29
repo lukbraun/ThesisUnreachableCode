@@ -20,7 +20,8 @@ Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud an
 
 
 Some instances of unreachable code may not be found using the mentioned before. For a more advanced approach statements have to be evaluated. Infeasible path conditions may be found by using a mathematical prover or SMT-Solver.
-
+\clearpage
+\pagebreak
 \section{Java Compiler}
 \label{sec:Java compiler}
 % Javac also used by IDEs. 
@@ -43,7 +44,7 @@ Unexpected return statements turn the following statements unreachable. As shown
 Unexpected break statements turn the following statements within the current scope of the loop unreachable as shown in Listing \ref{code:Java unexpected break}.
 
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testUnreachableWhile() {
 	int x = 3;
@@ -64,7 +65,7 @@ void testUnreachableWhileBoolean() {
 	\label{code:Java loop unreachable}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testSimpleIf() {
 	int x = 3;
@@ -74,7 +75,7 @@ void testSimpleIf() {
 	\label{code:Java infeasible undetected}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testFlag() {
 	int x = 3;
@@ -85,7 +86,7 @@ void testFlag() {
 	\label{code:Java flags}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testSystemExit() {
 	System.exit(0);
@@ -119,7 +120,7 @@ void testReturnInWhile() {
 	\label{code:Java unexpected return}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testBreak() {
 	while(true) {
@@ -143,7 +144,8 @@ void testBreak2() {
 Regarding unreachable code the Java compiler performs a data-flow analysis. The liveness of each statement will be analyzed by the "AliveAnalyzer" class in Flow.Java. The implemented AST-model makes use of the visitor pattern \cite{gammaDesignPatternsElements}. During analysis each node will be visited and checked according to definition \ref{quote:Java unreachable definition}.
 
 
-
+\clearpage
+\pagebreak
 \section{Integrated Development Environments}
 \label{sec:intelliJ}
 Integrated Development Environments (IDE) are used by almost every software developer daily and an integral tool for creating correct and safe code.
@@ -165,7 +167,7 @@ Regarding unreachable code the following IDEs were analyzed:
 
 % Beispiele für eclipse + IntelliJ
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testAlwaysTrueCondition() {
 	if(true) return; // Warning: Condition is always true
@@ -186,7 +188,7 @@ void testUnreachableWhile() {
 	\label{code:Java eclipse intelij always true or false}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testCondAlreadyChecked(boolean x) {
 	int y = 0;
@@ -201,7 +203,7 @@ void testCondAlreadyChecked(boolean x) {
 \label{code:Java eclipse fail to find this}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void duplicateConditions(int s_operationHour, int m_operationHour) {
 	if(s_operationHour != m_operationHour) { // Warning: Duplicate condition
@@ -223,7 +225,7 @@ void duplicateConditions(int s_operationHour, int m_operationHour) {
 	\caption{Even tough these warnings do not hint to the unreachable code directly, they show a code smell prone to errors. In this particular case the else branch of the second if-then-else block cannot be reached, since the method already returned. In case one of the variables used in the second said condition, this error would not occur! Removing the return statement in line 7 removes this type of problem, but the second condition would always evaluate to false. }
 	\label{code:Java intelij duplicate conditions}
 \end{program}
-
+\newpage
 \section{Sonarqube \& Sonarlint} % Could be interessting since it is very strict and performs more advanced analysis
 \label{sec:sonar}
 \emph{Sonarqube} \cite{sonarqube} and \emph{Sonarlint} \cite{SonarLintFixIssues} are products created by \emph{Sonarsource} \cite{CodeQualityCode}. Sonarqube is a static code analysis solution used in conjunction with a build server.
@@ -233,10 +235,12 @@ Sonarqube supports a multitude of programming languages ranging from Java to Pyt
 
 Sonarlint is available for some IDEs (including Eclipse and IntelliJ) in form of a plugin to provide immediate feedback. Note that this plugin only covers a subset of functionalities of sonarqube, but still provides better support than many internal inspectors built into IDEs.
 
+\newpage
 
-Using the same example as before (seen in Listing \ref{code:Java intelij duplicate conditions}) Sonarqube detects that this expression always evaluates to false, which provides better information than the internal code inspector of IntelliJ, as demonstrated in Listing \ref{code:Java sonarqube duplicate conditions}.
+Using the same example as before (seen in Listing \ref{code:Java intelij duplicate conditions}) Sonarqube detects that this expression always evaluates to false, which provides better information than the internal code inspector of IntelliJ, as demonstrated in Listing \ref{code:Java sonarqube duplicate conditions}. The example shown in Listing \ref{code:Java sonarqube hard example} cannot be detected. It appears that mutation in loops are not evaluated and will therefore not deliver any error. This type of error may only be detected by evaluating each statement.
 
-\begin{program}
+
+\begin{program}[h!]
 	\begin{JavaCode}
 void duplicateConditions(int s_operationHour, int m_operationHour) {
 	if(s_operationHour != m_operationHour) {
@@ -258,7 +262,7 @@ void duplicateConditions(int s_operationHour, int m_operationHour) {
 	\label{code:Java sonarqube duplicate conditions}
 \end{program}
 
-\begin{program}
+\begin{program}[h!]
 	\begin{JavaCode}
 void testLoop(boolean pred) {
 	int x = 1;
@@ -286,8 +290,7 @@ void testDeadCode() {
 	\label{code:Java sonarqube hard example}
 \end{program}
 
-The example shown in Listing \ref{code:Java sonarqube hard example} cannot be detected. It appears that mutation in loops are not evaluated and will therefore not deliver any error. This type of error may only be detected by evaluating each statement.
-
+\clearpage
 \section{Joogie}
 \label{sec:sca paper}
 % TODO: Verbessern und Beispiele hinzufügen
