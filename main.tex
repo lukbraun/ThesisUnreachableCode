@@ -16,6 +16,7 @@
 %%%----------------------------------------------------------
 
 \RequirePackage[utf8]{inputenc}		% bei der Verw. von lualatex oder xelatex entfernen!
+\usepackage{pdfpages}
 
 \graphicspath{{images/}}    % Verzeichnis mit Bildern und Grafiken
 \logofile{logo}							% Logo-Datei = images/logo.pdf (\logofile{}, wenn kein Logo gewünscht)
@@ -47,11 +48,12 @@
 %%%----------------------------------------------------------
 \frontmatter                    % Titelei (röm. Seitenzahlen)
 %%%----------------------------------------------------------
+\includepdf[pages=-]{titleblatt.pdf}
 
 % \maketitle
 \tableofcontents
 
-% \include{front/preface} 				% Vorwort ist optional
+
 \include{front/abstract}
 \include{front/kurzfassung}
 
