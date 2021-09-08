@@ -2,34 +2,33 @@
 
 \chapter {Evaluation}
 \label {cha:evaluation}
-This chapter contains interesting IEC functions and procedures, either found in production code or collected and translated from literature.
-Each example provides the code, the control flow graph, a description and some metrics, like execution time (median, minimum and maximum of 100 runs), number of instruction blocks needed to conclude the result and, most importantly, the reported violations.
+This chapter contains interesting IEC functions and procedures, either found in production code of an industrial partner, collected and translated from literature or were constructed to demonstrate how the implementation works and behaves.
+% Each example provides the code, the control flow graph, a description, execution time, number of instruction blocks needed to conclude the result and, most importantly, the reported violations.
+Each examples provides a description, the code, control flow graph and a visualized directed graph, which visualizes how the implementation executes the analysis. Each example will also be analyzed by the existing tools mentioned in Chapter \ref{cha:state of the art}. In the last Section \ref{sec:overview of results} runtime can be compared with each example.
 
+\section{Infeasible Code Example}
+% Beschreibung
+This example in Listing \ref{code:basic example 1} and its CFG in Figure \ref{fig:basic example 1 cfg} was found in production code and motivation for this thesis. It does not contain any loops or procedure calls (with the exception of \emph{RESET\_ALARM}, which may be ignored). Two variables of type integer, \emph{m\_operationHour} and \emph{s\_operationHour}, are checked for inequality in line 1 and 15. The second instance in line 15 cannot be reached, since it was already before and the function returned. Since neither \emph{m\_operationHour} or \emph{s\_operationHour} change their value, the second condition will never evaluate to true, resulting in unreachable code in line 16. This assignment will never be executed. 
+% Problem
+In line 11 an instance of unnecessary code can be observed, because \emph{s\_operationHour} must be equal to \emph{m\_operationHour}, which is 0 in this case. Removing the assignment in line 11 would therefore reduce the number of statements, while it has no effect on the result.
 
-\section{Basic Example}
-This example in Figure \ref{code:basic example 1 cfg} was found in production code and motivation for this implementation and thesis. There are no loops or procedure calls present, which change the variables provided as parameters (even though there are procedure calls, they cannot change them, since they are only declared as input variables).
-Basically, this algorithm contains simple assignments and conditions, which eventually lead to unreachable code when combined, only.
-As described at Figure \ref{code:basic example 1}, basic block 11 is not reachable, a consequence of the condition in line 15.
-Even though a simple example on how unreachable code may look like in production code, it is easily demonstrated how code becomes unreachable by conditions, when they are combined.
-The idea of the implementation originated from this example.
+% Ausführung
 
-% Metrics:
-%\begin{itemize}
-%	\item Runtime:
-%	\begin{itemize}
-%		\item Median: 24.29 ms
-%		\item Minimum: 21 ms
-%		\item Maximum: 31 ms
-%	\end{itemize}
-%	\item Number of analyzed instruction blocks: 17
-%	\item Violations: block 11
-%\end{itemize}
+Figure \ref{fig:basic example 1} illustrates the analysis process. This code is encapsulated in a function and both of the relevant variables do not have a concrete value assigned (it could be any integer), and therefore no state is known at the beginning. The first condition may be true or false and is therefore reachable, which is why both situations have to be considered creating, when visualized, two branches describing each possibility. Following the \emph{then} branch from basicblock 1 to basicblock 2. The assignment in line 2 equals both variables. Since \emph{s\_operationHour} can still contain any value, the condition in line 3 may still evaluate to either true or false. Whatever the result of this condition is, the function returns afterwards.
+
+Coming back to the first condition in line 1 and following the else branch, both variables must have the same value. The condition in line 9 may evaluate to true or false. If it is true, both variables must be 0 making the statement in line 11 obsolete. When the condition in line 9 is false the accumulated state from former instructions results in the constraints, that both variables must have the same value, which must not be 0. Therefore the condition in line 15 will always result in false and therefore basicblock 11 cannot be reached. 
+
+% State of the Art
+As described in earlier in Figure \ref{code:Java sonarqube duplicate conditions} the static code analysis tool Sonarqube \cite{sonarqube} does find this instance of infeasible code and reports it as such. As shown in Figure \ref{code:Java intelij duplicate conditions}, IntelliJ \cite{IntelliJIDEACapable} declares this condition as a duplicate condition. But other instances of infeasible conditions may not be found. 
+
+% Relevanz
+
 
 % 581ms
 % 17 Blöcke analysiert
 % Violation für block 11
 
-\begin{figure}[h!]
+\begin{program}[h!]
 	\begin{GenericCode}
 IF s_operationHour <> m_operationHour THEN
 	m_operationHour := s_operationHour;
@@ -48,55 +47,39 @@ ELSE
 	IF s_operationHour <> m_operationHour THEN
 		s_operationHour := m_operationHour;
 	END_IF;
-END_IF;	\end{GenericCode}
-	\centering
+END_IF;
+	\end{GenericCode}
+	\caption{The example contains one instance of unreachable code in line 16, since the condition always evaluates to false. This is due to the fact that this condition was already checked in line 1, returned in line 6, and since then none of the variables changed their values.}
+	\label{code:basic example 1}
+\end{program}
 
+\begin{figure}[h!]
+	\centering
 	\includegraphics[width=0.9\textwidth]{minimal-example-cfg}
-	\caption{A minimal example containing unreachable code due to unsatisfiable conditions. The condition in line 15 is never reachable, since this case was already handled in line 1 and the state of that variable did not change. Therefore basic block 11 is not reachable.}
-	\label{code:basic example 1 cfg}
+	\caption{Transformed IEC-code into the CFG of Listing \ref{code:basic example 1}. Since all arrows point forward no loop is present.}
+	\label{fig:basic example 1 cfg}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{minimal-example}
-	\caption{Analysis of example \ref{code:basic example 1 cfg}. }
-	\label{code:basic example 1}
+	\caption{Analysis of example shown in Figure \ref{fig:basic example 1 cfg}. As described in Listing \ref{code:basic example 1}, the condition in line 15 always evaluates to false, resulting in unreachable code in line 16, more specifically basicblock 11 in Figure \ref{fig:basic example 1 cfg}. }
+	\label{fig:basic example 1}
 \end{figure}
-\clearpage
-\pagebreak
+
 \section{Loops}
-The main consequence of the implementation is significantly greater execution time, especially, when loops are present.
-The following examples contain an almost identical algorithm. The only difference is that the first example in figure \ref{code:loop example 1 cfg} has a set value for x, whereas the example in figure \ref{code:loop example 2 cfg} does not have a limitation. Therefore basic block 6 is not reachable in the first example in figure \ref{code:loop example 1}, but may be reachable for the second example in figure \ref{code:loop example 2}.
+\label{sec:loops}
+The examples, seen in Listing \ref{code:loop example 1} and Listing \ref{code:loop example 2}, were created to show the implementation handles simple loops are analyzed. Both examples do not differ much. The only difference is that the example in Figure \ref{fig:loop example 1 cfg} declares the variable \emph{x} as a local variable, whereas the example in Figure \ref{fig:loop example 2 cfg} declares this variable as input. 
+In the first example the loop will be executed exactly four times and always incrementing the variable \emph{i}. Therefore \emph{i} holds the value 5 and the condition in line 8 will always evaluate to false and resulting in unreachable code in line 9 (basicblock 6). The can also be observed in Figure \ref{fig:loop example 1}.
 
 
-%Metrics (Example 1):
-%\begin{itemize}
-%	\item Runtime:
-%	\begin{itemize}
-%		\item Median: 23.69 ms
-%		\item Minimum: 22 ms
-%		\item Maximum: 34 ms
-%	\end{itemize}
-%	\item Number of analyzed instruction blocks: 20
-%	\item Violations: block 6
-%\end{itemize}
+The second example will lead to a different result, demonstrated in Figure \ref{fig:loop example 2}, since the value of variable \emph{x} may be of any number. Therefore the number of iterations would also be nondeterministic, as suggested in Figure \ref{fig:loop example 1} . But, as described in Section \ref{sub:early stopping}, this analysis will stop, because every statement is reachable, since \emph{x} could be three and therefore \emph{i} evaluates to three. 
 
 
+The tools covered in Chapter \ref{cha:state of the art} do not find this instance of unreachable code in the first example. Maybe joogie, described in Section \ref{sec:sca paper} may be able to find it. This is due to the fact, that the mentioned tools evaluate loops only once.
 
-%Metrics (Example 2):
-%\begin{itemize}
-%	\item Runtime:
-%	\begin{itemize}
-%		\item Median: 1.07 ms
-%		\item Minimum: <1 ms
-%		\item Maximum: 2 ms
-%	\end{itemize}
-%	\item Number of analyzed instruction blocks: 68
-%	\item Violations: none
-%\end{itemize}
-
-\begin{figure}[h!]
-	\begin{GenericCode}
+\begin{program}[h!]
+		\begin{GenericCode}
 i := 1;
 x := 5;
 		
@@ -107,62 +90,74 @@ END_WHILE;
 IF i = 3 THEN
 	x := 4;
 END_IF;	\end{GenericCode}
+\centering
+\caption{A simple loop that increments a number. Since \emph{i} is dependent on the iterations, which are limited by and will be equal to \emph{x}, in this case 5, the condition in line 8 will never evaluate true.}
+\label{code:loop example 1}
+\end{program}
+
+\begin{figure}[h!]
 	\centering
 	% 61ms
 	% 20
 	% Violation für block 6
 	\includegraphics[width=0.6\textwidth]{basic-while-cfg}
-	\caption{The variable i will change inside the loop. As long as x is not equal to 3, the basic block 6 is unreachable. }
-	\label{code:loop example 1 cfg}
+	\caption{Transformed IEC-code into the CFG of Listing \ref{code:loop example 1}. As long as x is not equal to 3, the basic block 6 is unreachable. The loop can be observed between the basicblocks 2 and 3.}
+	\label{fig:loop example 1 cfg}
 \end{figure}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.6\textwidth]{basic-while}
-	\caption{Analysis of example \ref{code:loop example 1 cfg}. }
-	\label{code:loop example 1}
+	\caption{Analysis of example shown in Listing \ref{code:loop example 1} and Figure \ref{fig:loop example 1 cfg}. For each iteration the analysis checks if the condition of the loop finally evaluates to true until it does. Since the variable \emph{x} is known, there is only one feasible branch to follow.}
+	\label{fig:loop example 1}
 \end{figure}
-\begin{figure}[h!]
+
+\begin{program}[h!]
 	\begin{GenericCode}
 i := 1;
-		
+	
 WHILE i < x DO
 	i := i + 1;
 END_WHILE;
-		
+	
 IF i = 3 THEN
 	x := 4;
 END_IF;		\end{GenericCode}
+
+\centering
+\caption{Same as \ref{code:loop example 1}, but x is an input variable. Therefore it may be 3, so it could be reachable.}
+\label{code:loop example 2}
+\end{program}
+\begin{figure}[h!]
 	\centering
 	% <1ms
 	% 68
 	% No violations
 	\includegraphics[width=0.6\textwidth]{basic-while-input-cfg}
-	\caption{Same as \ref{code:loop example 1}, but x is an input variable. Therefore it may be 3, so it could be reachable.}
-	\label{code:loop example 2 cfg}
+	\caption{This CFG is almost identical to \ref{fig:loop example 1 cfg}, with the exception that the assignment in line 2 is missing.}
+	\label{fig:loop example 2 cfg}
 \end{figure}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{basic-while-input}
-	\caption{Analysis of example \ref{code:loop example 2 cfg}.}
-	\label{code:loop example 2}
+	\caption{Analysis of example shown in Listing \ref{code:loop example 2} and Figure \ref{fig:loop example 2 cfg}. Since the value of \emph{x} is nondeterministic, every possible value has to be explored, in contrast to \ref{fig:loop example 1}. Without any type of early stopping, this analysis would try to calculate forever, as indicated by the rounded boxes. }
+	\label{fig:loop example 2}
 \end{figure}
 \section{Function and Procedure Calls}
-This example in Listing \ref{code:func test 1} demonstrates the handling of function- and procedure calls. It contains 2 different procedures: FooOutput and algo1 (which is part of an instantiated algorithm block). 
-As described in Section, \ref{sub:handling procedure and function calls} only the declaration of parameters matters. Even if the function does not actually change the variable, it will be handled as such. 
-Due to these circumstances, basic blocks 5 and 9 are not reachable.
+This example in Listing \ref{code:func test 1} was created to demonstrate how function and procedure calls are handled. The functionblock \emph{FooOutput} and \emph{algo1} of the instantiated algorithmblock are called. The functionblock \emph{FooOutput} takes three parameters. The first is an input parameter, which is passed by value, the second is an output parameter, possibly changing the value, and the last parameter is an in-out parameter, which may also change its value.
+The algorithm \emph{algo1} has a similar declaration. The first parameter, declared as \emph{in1}, is an input parameter, the second is an in-out parameter, called \emph{in\_out1}, and the last, called \emph{out1}, is an out paramter.
 
+After the first three assignments the funcitonblock is called and therefore the variables \emph{tmp1} and \emph{tmp2} may change their value. As described in Section \ref{sub:handling procedure and function calls} this analysis is done intraprocedurally, meaning the concrete new values these variables hold are not evaluated, but become rather nondeterministic, meaning the state is reset. This can be observed in Figure \ref{fig:func test 1}. The assignments and the procedure call are in basicblock 1 (as seen in Figure \ref{fig:func test 1 cfg}), but in the following branches (in \ref{fig:func test 1}) do not contain the restrictions for the variables \emph{tmp1} and \emph{tmp2} anymore. Therefore the condition in line 7 may either be true or false.
+Since \emph{tmp1} does not change,  the condition in line 11 will always evaluate false, causing unreachable code in line 12 (basicblock 5).
 
-%Metrics:
-%\begin{itemize}
-%	\item Runtime:
-%	\begin{itemize}
-%		\item Median: 537 ms
-%		\item Minimum: 492 ms
-%		\item Maximum: 841 ms
-%	\end{itemize}
-%	\item Number of analyzed instruction blocks: 31
-%	\item Violations: block 5
-%\end{itemize}
+The procedure call in line 15 creates nondeterministic state for the variables \emph{tmp1} and \emph{tmp3}, which means the condition in line 17 may evaluate to true or false.
+
+The procedure call in line 21 has the same effect as the one before, but using named parameters (the parameters \emph{tmp1} and \emph{tmp3} switched position, but are handled the same as before anyways).
+
+The variable \emph{tmp2} does not change, but may hold value 2 when the prior condition in line 7 evaluated to true. Therefore the condition may be true, but does not have to be. Therefore the assignment in line 24 is reachable. 
+
+When this example is converted to java, the parameters have to be handled. Variables of primitive datatypes are passed by value, while other are passed by reference. Therefore a special class has to be introduced to simulate this behavior. 
+
+None of the tools mentioned in chapter \ref{cha:state of the art}, with maybe the exception of joogie \ref{sec:sca paper}, which could not be executed.
 
 
 \begin{program}[h!]
@@ -202,37 +197,35 @@ END_IF;	\end{GenericCode}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{easy-func-test-cfg}
-	\caption{Control flow graph of example \ref{code:func test 1}}
+	\caption{CFG of example shown in Listing \ref{code:func test 1}. It does not contain any loops, since all arrows point in the same direction, but does contain many branches, needed for the demonstration of this analysis.}
 	\label{fig:func test 1 cfg}
 \end{figure}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{easy-func-test}
-	\caption{Analysis of example \ref{fig:func test 1 cfg}.}
+	\caption{Analysis of example shown in Listing \ref{code:func test 1} and Figure \ref{fig:func test 1 cfg}. Function and procedure calls have been dissolved and reset the actual parameters passed as output variables to a nondeterministic state. This can be observed for example in the blocks after the second block (basicblock 1), since the assignments to \emph{tmp2} and \emph{tmp3} are not shown in the following blocks.}
 	\label{fig:func test 1}
 \end{figure}
 
 \section{Hard Example}
-This example in Figure \ref{code:hard example 1} and Figure \ref{code:hard example 1 cfg} was found in the literature \cite{Click_1995} and it was stated that the usual method for finding unreachable code is not able to detect this instance. 
-Since the implementation is different at its core, it was only natural to test and compare the results.
-Since no other functions were injected for this analysis, in contrast to the method described in chapter \ref{cha:state of the art}, this instance will be found and reported.
-Note that the loop contains a variable which does not change, which will never stop. Therefore the analysis would stop early and no violation would be reported without the correct configuration. 
-If the condition would have been different, it is easier to detect, but since this example has been used by different sources it was not altered.
+The example in Figure \ref{code:hard example 1} and Figure \ref{fig:hard example 1} was found in the literature \cite{Click_1995}. In this research paper it is stated:
+\begin{quote}
+	Neither
+	simple constant
+	propagation
+	nor unreachable-code elimination
+	discovers these facts because
+	each analysis
+	needs a fact
+	that can only be discovered
+	by the other.
+\end{quote}
+Since this implementation does not rely on constant propagation and does not simplify loops in any form, it should be detected. In this example shown in Listing \ref{code:hard example 1} the two important variables are \emph{x} and \emph{b}. The \emph{pred} variable could as well be a function, as the name suggests, but is not of importance for this analysis. The first statement in the loop in line 4 always evaluates to false, since the value of variable \emph{x} is one and does never change. Therefore the condition in line 5 always evaluates to false and the statement in line 6 (or basicblock 4 in \ref{fig:hard example 1}) is unreachable. As Figure \ref{fig:hard example 1 cfg} suggests, this analysis may never finish and therefore the implementation would not be able to find this instance of unreachable code. This can be circumvented by following the flow of a loop for a set amount of time as stated in Section \ref{sub:early stopping}. By doing so false positives could be reported, because during the analysis a loop could not have been evaluated often enough. When for example the repeat-until loop was replaced by a for loop and be evaluated exactly n times, the analysis could potentially evaluate this loop m times, where m is smaller than n. When also replacing the condition in line 5 so that it would evaluate to true in the last iteration, it could potentially not be analyzed correctly by the implementation.
 
+Neither of the tools described in Chapter \ref{cha:state of the art} are able to find this kind of error.
+This begs the question if a static code analysis tool must be capable to find this kind of error by expanding potentially enormous amounts of time and power necessary to find this edge cases. Other static code analysis tools do not even check multiple iterations of loops to save on execution time. Integrated development environments must deliver warnings for errors as fast as possible to guarantee a pleasant experience. Only separate tools, like sonarqube \cite{sonarqube}, could have the power to detect these edge cases. But even then bigger projects could contain many multiple loops, which could slow down this analysis significantly. Paired with multiple function and procedure calls the execution time could be too high to tolerate, with little extra information. As described in Section \ref{sub:problems and barriers} some sort of preprocessing could work to reduce execution time.
 
-%Metrics:
-%\begin{itemize}
-%	\item Runtime:
-%	\begin{itemize}
-%		\item Median: 26.84 ms
-%		\item Minimum: 25 ms
-%		\item Maximum: 34 ms
-%	\end{itemize}
-%	\item Number of analyzed instruction blocks: 47
-%	\item Violations: block 4
-%\end{itemize}
-
-\begin{figure}[hbt!]
+\begin{program}[h!]
 	\begin{GenericCode}
 x := 1;
 	
@@ -243,33 +236,42 @@ REPEAT
 	END_IF;    
 UNTIL pred
 END_REPEAT;	\end{GenericCode}
+	\centering
+	\caption{This example cannot be analyzed correctly by existing static code analysis tools. Humans may have an easier time to find this error in lines 4 and five. Since the variable \emph{b}, relevant for the condition in line 5, is dependent on x, which does only change when b would be true in line 4, line 6 becomes unreachable. }
+	\label{code:hard example 1}	
+\end{program}
+
+\begin{figure}[hbt!]
 	% 20ms
 	% 47
 	% Violation Block 4
 	\centering
 	\includegraphics[width=0.4\textwidth]{hard-example-cfg}
-	\caption{This procedure cannot be analyzed correctly and will not report that basic block 4 is unreachable. }
-	\label{code:hard example 1}
+	\caption{CFG of example shown in Listing \ref{code:hard example 1}. Since the condition in basicblock 2 never evaluates to true, basicblock 4 becomes unreachable.}
+	\label{fig:hard example 1}
 \end{figure}
 \begin{figure}[hbt!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{hard-example}
-	\caption{Analysis of example \ref{code:hard example 1 cfg}.}
-	\label{code:hard example 1 cfg}
+	\caption{Analysis of example shown in Listing \ref{code:hard example 1} and Figure \ref{fig:hard example 1}. This analysis would run forever without the correct configuration. After a defined amount of iterations the analysis stops and reports, which blocks are unreachable. This may work for this particular example, but could cause problems otherwise, since the condition of the loop is not depend on any variables, that may change inside the body of the loop or any variable is relevant outside the loop.}
+	\label{fig:hard example 1 cfg}
 \end{figure}
 
 \section{Overview of results}
-In Table \ref{tab:runtime-overview} the runtime of each example can be compared to others. Interestingly the number of analyzed block does have a direct effect on runtime. Less restrictions result in less execution time. Handling of function and procedure calls is tedious, because the information of the called function/procedure takes time. In this implementation all functions and procedures are stored in a database and each for each call in the source code the information has to be looked up.
+\label{sec:overview of results}
+In Table \ref{tab:runtime-overview} the runtime of the analysis of each example can be compared to others. The collected metrics contain median, minimum and maximum runtime as well as the analyzed blocks. 
+Each example was run exactly 100 times on a machine with a Intel(R) Core(TM) i7-8665U CPU @ 1.90 GHz, 2112 Mhz, 4 Cores with 8 Logical Processors. 
+Interestingly the number of analyzed block does have a direct effect on runtime. This may be due to the reason that some of the analyzed blocks were not completely evaluated, at least the example described in Section \ref{sec:loops}, because the analysis stops prematurely. Handling of function and procedure calls is tedious, because the information of the called function/procedure takes time. In this implementation all functions and procedures are stored in a database and for each call in the source code the information has to be looked up.
 
-\begin{table}
+\begin{table}[h!]
 \begin{tabular}{lcccc}
-	Example                      & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Median\\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Minimum \\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Maximum\\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}\# \\ of analyzed blocks\end{tabular}} \\
-	\hline
-	Basic Example                & 23ms                                                                         & 21ms                                                                           & 31ms                                                                          & 17                                                                                   \\
-	Loops (No Input Variable)    & 23ms                                                                         & 22ms                                                                           & 34ms                                                                          & 20                                                                                   \\
-	Loops (With Input Variable)  & 1ms                                                                          & \textless{}1ms                                                                 & 2ms                                                                           & 68                                                                                   \\
-	Function and Procedure Calls & 511ms                                                                        & 492ms                                                                          & 841ms                                                                         & 31                                                                                   \\
-	Hard Example                 & 26ms                                                                         & 25ms                                                                           & 34ms                                                                          & 47                                                                                  
+Example                      & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Median\\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Minimum \\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}Maximum\\ Runtime\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[c]{@{}c@{}}\# \\ of analyzed blocks\end{tabular}} \\
+\hline
+Infeasible Code Example                & 23ms                                                                         & 21ms                                                                           & 31ms                                                                          & 17                                                                                   \\
+Loops (No Input Variable)    & 23ms                                                                         & 22ms                                                                           & 34ms                                                                          & 20                                                                                   \\
+Loops (With Input Variable)  & 1ms                                                                          & \textless{}1ms                                                                 & 2ms                                                                           & 68                                                                                   \\
+Function and Procedure Calls & 511ms                                                                        & 492ms                                                                          & 841ms                                                                         & 31                                                                                   \\
+Hard Example                 & 26ms                                                                         & 25ms                                                                           & 34ms                                                                          & 47                                                                                  
 \end{tabular}
 	\caption{Overview of the tested examples and their minimum, maximum and median runtime. One hundred runs per example were executed.}
 	\label{tab:runtime-overview}
