@@ -4,11 +4,11 @@
 \label {cha:evaluation}
 This chapter contains interesting IEC functions and procedures, either found in production code of an industrial partner, collected and translated from literature or were constructed to demonstrate how the implementation works and behaves.
 % Each example provides the code, the control flow graph, a description, execution time, number of instruction blocks needed to conclude the result and, most importantly, the reported violations.
-Each examples provides a description, the code, control flow graph and a visualized directed graph, which visualizes how the implementation executes the analysis. Each example will also be analyzed by the existing tools mentioned in Chapter \ref{cha:state of the art}. In the last Section \ref{sec:overview of results} runtime can be compared with each example.
+Each example provides a description, the code, control flow graph and a visualized directed graph, which visualizes how the implementation executes the analysis. Each example will also be analyzed by the existing tools mentioned in Chapter \ref{cha:state of the art}. In the last Section \ref{sec:overview of results} runtime can be compared with each example.
 
 \section{Infeasible Code Example}
 % Beschreibung
-This example in Listing \ref{code:basic example 1} and its CFG in Figure \ref{fig:basic example 1 cfg} was found in production code and motivation for this thesis. It does not contain any loops or procedure calls (with the exception of \emph{RESET\_ALARM}, which may be ignored). Two variables of type integer, \emph{m\_operationHour} and \emph{s\_operationHour}, are checked for inequality in line 1 and 15. The second instance in line 15 cannot be reached, since it was already before and the function returned. Since neither \emph{m\_operationHour} or \emph{s\_operationHour} change their value, the second condition will never evaluate to true, resulting in unreachable code in line 16. This assignment will never be executed. 
+This example in Listing \ref{code:basic example 1} and its CFG in Figure \ref{fig:basic example 1 cfg} was found in production code and motivation for this thesis. It does not contain any loops or procedure calls (with the exception of \emph{RESET\_ALARM}, which may be ignored). Two variables of type integer, \emph{m\_operationHour} and \emph{s\_operationHour}, are checked for inequality in lines 1 and 15. The second instance in line 15 cannot be reached, since it was already before and the function returned. Since neither \emph{m\_operationHour} nor \emph{s\_operationHour} change their value, the second condition will never evaluate too true, resulting in unreachable code in line 16. This assignment will never be executed. 
 % Problem
 In line 11 an instance of unnecessary code can be observed, because \emph{s\_operationHour} must be equal to \emph{m\_operationHour}, which is 0 in this case. Removing the assignment in line 11 would therefore reduce the number of statements, while it has no effect on the result.
 
@@ -16,7 +16,7 @@ In line 11 an instance of unnecessary code can be observed, because \emph{s\_ope
 
 Figure \ref{fig:basic example 1} illustrates the analysis process. This code is encapsulated in a function and both of the relevant variables do not have a concrete value assigned (it could be any integer), and therefore no state is known at the beginning. The first condition may be true or false and is therefore reachable, which is why both situations have to be considered creating, when visualized, two branches describing each possibility. Following the \emph{then} branch from basicblock 1 to basicblock 2. The assignment in line 2 equals both variables. Since \emph{s\_operationHour} can still contain any value, the condition in line 3 may still evaluate to either true or false. Whatever the result of this condition is, the function returns afterwards.
 
-Coming back to the first condition in line 1 and following the else branch, both variables must have the same value. The condition in line 9 may evaluate to true or false. If it is true, both variables must be 0 making the statement in line 11 obsolete. When the condition in line 9 is false the accumulated state from former instructions results in the constraints, that both variables must have the same value, which must not be 0. Therefore the condition in line 15 will always result in false and therefore basicblock 11 cannot be reached. 
+Coming back to the first condition in line 1 and following the else branch, both variables must have the same value. The condition in line 9 may evaluate to true or false. If it is true, both variables must be 0 making the statement in line 11 obsolete. When the condition in line 9 is false, the accumulated state from former instructions results in the constraints that both variables must have the same value, which must not be 0. Therefore the condition in line 15 will always result in false and therefore basicblock 11 cannot be reached. 
 
 % State of the Art
 As described in earlier in Figure \ref{code:Java sonarqube duplicate conditions} the static code analysis tool Sonarqube \cite{sonarqube} does find this instance of infeasible code and reports it as such. As shown in Figure \ref{code:Java intelij duplicate conditions}, IntelliJ \cite{IntelliJIDEACapable} declares this condition as a duplicate condition. But other instances of infeasible conditions may not be found. 
@@ -56,7 +56,7 @@ END_IF;
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.9\textwidth]{minimal-example-cfg}
-	\caption{Transformed IEC-code into the CFG of Listing \ref{code:basic example 1}. Since all arrows point forward no loop is present.}
+	\caption{Transformed IEC-code into the CFG of Listing \ref{code:basic example 1}. Since all arrows point forward, no loop is present.}
 	\label{fig:basic example 1 cfg}
 \end{figure}
 
@@ -70,13 +70,13 @@ END_IF;
 \section{Loops}
 \label{sec:loops}
 The examples, seen in Listing \ref{code:loop example 1} and Listing \ref{code:loop example 2}, were created to show the implementation handles simple loops are analyzed. Both examples do not differ much. The only difference is that the example in Figure \ref{fig:loop example 1 cfg} declares the variable \emph{x} as a local variable, whereas the example in Figure \ref{fig:loop example 2 cfg} declares this variable as input. 
-In the first example the loop will be executed exactly four times and always incrementing the variable \emph{i}. Therefore \emph{i} holds the value 5 and the condition in line 8 will always evaluate to false and resulting in unreachable code in line 9 (basicblock 6). The can also be observed in Figure \ref{fig:loop example 1}.
+In the first example, the loop will be executed exactly four times and always increasing the variable \emph{i}. Therefore \emph{i} holds the value 5 and the condition in line 8 will always evaluate to false and resulting in unreachable code in line 9 (basicblock 6). They can also be observed in Figure \ref{fig:loop example 1}.
 
 
 The second example will lead to a different result, demonstrated in Figure \ref{fig:loop example 2}, since the value of variable \emph{x} may be of any number. Therefore the number of iterations would also be nondeterministic, as suggested in Figure \ref{fig:loop example 1} . But, as described in Section \ref{sub:early stopping}, this analysis will stop, because every statement is reachable, since \emph{x} could be three and therefore \emph{i} evaluates to three. 
 
 
-The tools covered in Chapter \ref{cha:state of the art} do not find this instance of unreachable code in the first example. Maybe joogie, described in Section \ref{sec:sca paper} may be able to find it. This is due to the fact, that the mentioned tools evaluate loops only once.
+The tools covered in Chapter \ref{cha:state of the art} do not find this instance of unreachable code in the first example. Maybe joogie, described in Section \ref{sec:sca paper} may be able to find it. This is due to the fact that the mentioned tools evaluate loops only once.
 
 \begin{program}[h!]
 		\begin{GenericCode}
@@ -144,18 +144,18 @@ END_IF;		\end{GenericCode}
 \end{figure}
 \section{Function and Procedure Calls}
 This example in Listing \ref{code:func test 1} was created to demonstrate how function and procedure calls are handled. The functionblock \emph{FooOutput} and \emph{algo1} of the instantiated algorithmblock are called. The functionblock \emph{FooOutput} takes three parameters. The first is an input parameter, which is passed by value, the second is an output parameter, possibly changing the value, and the last parameter is an in-out parameter, which may also change its value.
-The algorithm \emph{algo1} has a similar declaration. The first parameter, declared as \emph{in1}, is an input parameter, the second is an in-out parameter, called \emph{in\_out1}, and the last, called \emph{out1}, is an out paramter.
+The algorithm \emph{algo1} has a similar declaration. The first parameter, declared as \emph{in1}, is an input parameter, the second is an in-out parameters, called \emph{in\_out1}, and the last, called \emph{out1}, is an out parameter.
 
-After the first three assignments the funcitonblock is called and therefore the variables \emph{tmp1} and \emph{tmp2} may change their value. As described in Section \ref{sub:handling procedure and function calls} this analysis is done intraprocedurally, meaning the concrete new values these variables hold are not evaluated, but become rather nondeterministic, meaning the state is reset. This can be observed in Figure \ref{fig:func test 1}. The assignments and the procedure call are in basicblock 1 (as seen in Figure \ref{fig:func test 1 cfg}), but in the following branches (in \ref{fig:func test 1}) do not contain the restrictions for the variables \emph{tmp1} and \emph{tmp2} anymore. Therefore the condition in line 7 may either be true or false.
+After the first three assignments, the funcitonblock is called and therefore the variables \emph{tmp1} and \emph{tmp2} may change their value. As described in Section \ref{sub:handling procedure and function calls} this analysis is done intraprocedurally, meaning the concrete new values these variables hold is not evaluated, but become rather nondeterministic, meaning the state is reset. This can be observed in Figure \ref{fig:func test 1}. The assignments and the procedure call are in basicblock 1 (as seen in Figure \ref{fig:func test 1 cfg}), but in the following branches (in \ref{fig:func test 1}) do not contain the restrictions for the variables \emph{tmp1} and \emph{tmp2} anymore. Therefore the condition in line 7 may either be true or false.
 Since \emph{tmp1} does not change,  the condition in line 11 will always evaluate false, causing unreachable code in line 12 (basicblock 5).
 
 The procedure call in line 15 creates nondeterministic state for the variables \emph{tmp1} and \emph{tmp3}, which means the condition in line 17 may evaluate to true or false.
 
-The procedure call in line 21 has the same effect as the one before, but using named parameters (the parameters \emph{tmp1} and \emph{tmp3} switched position, but are handled the same as before anyways).
+The procedure call in line 21 has the same effect as the one before, but using named parameters (the parameters \emph{tmp1} and \emph{tmp3} switched position, but are handled the same as before).
 
 The variable \emph{tmp2} does not change, but may hold value 2 when the prior condition in line 7 evaluated to true. Therefore the condition may be true, but does not have to be. Therefore the assignment in line 24 is reachable. 
 
-When this example is converted to java, the parameters have to be handled. Variables of primitive datatypes are passed by value, while other are passed by reference. Therefore a special class has to be introduced to simulate this behavior. 
+When this example is converted to java, the parameters have to be handled. Variables of primitive datatypes are passed by value, while others are passed by reference. Therefore a special class has to be introduced to simulate this behavior. 
 
 None of the tools mentioned in chapter \ref{cha:state of the art}, with maybe the exception of joogie \ref{sec:sca paper}, which could not be executed.
 
