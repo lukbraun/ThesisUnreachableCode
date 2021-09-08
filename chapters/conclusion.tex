@@ -13,4 +13,8 @@ As mentioned in a previous Section \ref{sub:problems and barriers}, the downside
 This complexity has to be addressed, because otherwise it does not make any sense to use this analysis in production, especially for bigger projects.
 
 
-Other tools, like sonarqube, as described in Section \ref{sec:sonar}, for example, do not offer to check loops to a full extent, but still manage to find a decent number of violations. Joogie, as described in Section \ref{sec:sca paper}, simplifies loops into three unwindings. Similar forms of preprocessing could reduce runtime significantly by trading a little bit of accuracy, making it usable in production. 
+As demonstrated in Section \ref{code:hard example 1}, using correct configuration may be able to discover instances of unreachable code, which no other tool described in Chapter \ref{cha:state of the art} would be able to do. But this can only be done if the correct configuration is known, possibly leading to false positives. It is questionable, if this approach is practicable.
+
+
+Other tools, like sonarqube, as described in Section \ref{sec:sonar}, for example, do not offer to check loops to a full extent, but still manage to find a decent number of violations. Joogie, as described in Section \ref{sec:sca paper}, simplifies loops into three unwindings. Similar forms of preprocessing could reduce runtime significantly by trading a little bit of accuracy, making it usable in production environments. 
+
