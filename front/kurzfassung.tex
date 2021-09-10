@@ -9,4 +9,6 @@ Unerreichbarer Code wird nicht nur durch spezielle statische Code-Analyse-Tools 
 
 In dieser Arbeit wurde diese Prüfung in eine bestehende statische Codeanalyse eingeführt, die auf Structured Text abzielt, eine Pascal-ähnliche Sprache, die in der Norm IEC-61131-3 enthalten ist. Diese Analyse erfordert die Darstellung des Programms in Form eines Kontrollflussgraphen und vereinfacht das Durchlaufen jedes Pfades. Der Kontext enthält mögliche Werte für jede Variable in Form von Prädikaten. Diese Prädikate können von einem SMT-Solver auf Machbarkeit geprüft werden, der in der Lage ist, mögliche konkrete Werte für jede Variable zu bestimmen. 
 
+Zu diesem Zeitpunkt funktioniert der implementierte Ansatz nur auf kleinen,  konstruierten Beispielen. Dafür ist die implementierung in der Lage besondere Fälle von unreachable code zu finden, die kein anderes untersuchtes Tool in der Lage war zu finden. Da nicht alle Sprachfeatures berücksichtigt wurden (z.b. Arrays, Strukturen) ist die Implementierung nicht komplett und sollte daher eher als unvollständig betrachtet werden.
+
 \end{german}

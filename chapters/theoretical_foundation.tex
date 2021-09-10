@@ -161,13 +161,13 @@ Dead code occurs for example, when intended extensibility or features are no lon
 Unreachable code, especially infeasible code, occurs due to faulty logic and may not as straightforward to fix.
 \subsection{Infeasible Code}
 \label{sub:infeasible code}
-
+Infeasible code is a subset of unreachable code.
 Infeasible code only occurs due to conditions which always evaluate to false. Another reason could be confusion around expressions \cite{Eichberg_2015}.
 
 
 Infeasible code may occur either due to conditions which only consist of boolean literals (and expressions), constants, or as consequence of former conditions, as demonstrated in Listing \ref{code:infeasible code}.
 
-Infeasible code is a subset of unreachable code.
+
 \begin{program}[h!]
 	\begin{JavaCode}
 		public class InfeasibleCode {
@@ -198,14 +198,6 @@ Infeasible code is a subset of unreachable code.
 	\caption{Infeasible code is determined by conditions which always result with false. }
 	\label{code:infeasible code}
 \end{program}
-
-
-% \cite{Eichberg_2015}
-% \cite{Arlt_2013}
-% \cite{arltJoogieInfeasibleCode2012}
-% \cite{arltJoogieJavaJimple2013}
-% Nur bedingungen
-
 
 \section{IEC 61131-3}
 \label{sec:iec}
@@ -241,6 +233,7 @@ Recursion is not allowed, neither directly nor indirectly.
 The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
 \begin{itemize}
 	\item \emph{Instruction List} is an assembly like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
+	% TODO 
 	\item \emph{Structured Text} is a pascal-like, higher-level programming language (see Listing \ref{code:st}).
 	\item \emph{Function block Diagram} are partly graphical and partly textual (see Figure \ref{code:fbd}). The language is inspired from the field of signal processing. 
 	\item \emph{Ladder Diagram} is a graphical language, mainly used when processing boolean values (see Figure \ref{code:ld}).
@@ -311,6 +304,47 @@ The logic part of POUs may be implemented in one of five distinct programming la
 \clearpage
 \pagebreak
 
+% TODO
+% \section{Static Code Analysis}
+% Static code analysis is used to analyze source code for a wide range of different code smells without actually executing the code. 
+% The goal is to detect potential errors early as well as hinting to problematic code, which either is too complex or contains unwanted constructs potentially causing errors. 
+% Many
+
+% TODO 
+%\subsection{Abstract Syntax Tree}
+\section{Abstract Syntax Tree}
+\label{sub:ast}
+Abstract syntax trees (AST) are a hierarchical representation of the abstract syntactic structure of text written in a formal language. The AST is created during parsing and a central piece of compilers and static code analysis tools (described in the introduction of Chapter \ref{cha:state of the art}). This representation does only contain relevant expressions, stripping unnecessary delimiters (e.g., braces). Each node represents an operator, while the children represent the operands as described by Aho \cite{ahoCompilersPrinciplesTechniques2007}. Therefore not only expressions, but whole projects may be represented by a single AST.
+
+As described by Prähofer \cite{Prahofer_2012}, the AST representation of an IEC program begins with the root node of an IEC project, which consists of multiple functional units, their descendants consist of functions and function blocks, which contain IEC code. Therefore all program elements are presented in form of an AST node as shown in Figure \ref{fig:ast basics}.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{ast-iec}
+	\caption{Example IEC project containing FUs with arithmetic expressions and assignments represented in a simplified AST.}
+	\label{fig:ast basics}
+\end{figure}
+
+% TODO Bild von AST einfügne
+%\subsection{Control Flow Graph}
+\section{Control Flow Graph}
+\label{sub:cfg}
+Control flow graph (CFG) is a form of representation of a program, representing possible paths a program can take. These paths are a result of if-then-else conditions and loops, which also contain conditions, which have to be checked. 
+This representation is necessary for certain types of analysis, e.g. dead code analysis or unreachable code analysis.
+
+The control flow graph consists of so called basicblocks, which contains the longest sequence of instructions without any jumps \cite{Prahofer_2012}. Jumps may be conditional (e.g., if-then-else, loops) or unconditional (e.g., break, goto) and are represented by (directed) edges. These edges connect basicblocks (see Figure \ref{fig:cfg basics}). Code without loops represented in form of a CFG contains edges pointing in one direction. Loops may easily be spotted, since they contain an edge to a former block. Basicblocks containing instructions that perform a conditional jumps have two outgoing edges. The first edge contains the path, if the condition evaluates true, the second otherwise. 
+
+Usually a CFG is created for each individual procedure/function. 
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.5\textwidth]{cfg}
+	\caption{Control flow graph of a program consisting of one conditional jump using if-else and another conditional jump for a loop on the right side having an outgoing edge back to a previous basicblock.}
+	\label{fig:cfg basics}
+\end{figure}
+
+% TODO Subsection über KEMRO-IEC ? oder in IMPL erwähnen... --> In Impl erwähnen
+
 \section{Satisfiable Modulo Theory}
 
 Satisfiable modulo theory (short SMT) is defined as stated in \cite{demouraZ3EfficientSMT2008}:
@@ -336,6 +370,7 @@ The last part contains an instruction for the SMT-Solver to check the satisfiabi
 Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
 SMT-Solvers may also implement the simplification of a given expression.
 
+% TODO 
 \begin{program}[h!]
 	\begin{LispCode}
 		; declaring variables

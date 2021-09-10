@@ -4,7 +4,10 @@
 \label{cha:state of the art}
 
 Analyzing code is a central part of software development. Naturally this process can be automated to some degree using various static code analysis tools. 
-Some of these tools are applied at different stages during development ranging from compilation time to static code analysis in the cloud.
+Some of these tools are applied at different stages during development ranging from compilation time to static code analysis in the cloud. 
+Generally static code analysis benefits by detecting errors and problematic constructs early, but also highlights code that does not adhere to coding guidelines.
+
+
 In this chapter multiple static code analysis tools will be presented, ranging in quality for detecting bugs (with a focus on unreachable code).
 The accuracy for finding unreachable code increases with each tool presented. 
 The examples are provided in form of Java source code beginning with the Java compiler (OpenJDK \cite{OpenJDK} implementation) itself, which verifies the correctness of source code before code generation. 
