@@ -221,10 +221,11 @@ There are three types of POUs \cite{johnIEC611313Programming2010}:
 \end{itemize}
 POUs contain two parts:
 \begin{itemize}
-	\item \emph{Declaration} of variables. Every variable that is used must be declared before.
-	\item \emph{Code} which contains the logic. 
+	\item \emph{Declaration} of variables. Every variable that is used must be declared before. Elementary data types are booleans, signed and unsigned integers, reals, time, dates, durations and strings. Furthermore programmers may define their own custom datatypes using type definitions, enumerations and arrays.
+	\item \emph{Code} which contains the logic written in one of the languages mentioned in Section \ref{sub:iec-lang}.
 \end{itemize}
 POUs can be called with or without parameters. Parameters may be provided directly or via global/external variables.
+
 Recursion is not allowed, neither directly nor indirectly. 
 
 
@@ -233,56 +234,56 @@ Recursion is not allowed, neither directly nor indirectly.
 The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
 \begin{itemize}
 	\item \emph{Instruction List} is an assembly like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
-	% TODO 
-	\item \emph{Structured Text} is a pascal-like, higher-level programming language (see Listing \ref{code:st}).
+	\item \emph{Structured Text} is described in Section \ref{sub:structured text}.
 	\item \emph{Function block Diagram} are partly graphical and partly textual (see Figure \ref{code:fbd}). The language is inspired from the field of signal processing. 
 	\item \emph{Ladder Diagram} is a graphical language, mainly used when processing boolean values (see Figure \ref{code:ld}).
 	\item \emph{Sequential Function Chart} is a graphical language, whose goal is to break complex programs into small manageable units (see Figure \ref{code:sfc}). 
 \end{itemize}
-% \subsection{Variables}
-
 
 \begin{program}[h!]
 	\begin{GenericCode}
-		VAR
-		FirstOperand, SecondOperand, Result: INT := 10;
-		StringOp: String[30] := '12345678901234567890';
-		StringRes: String[25];
-		END_VAR
+VAR
+	FirstOperand, SecondOperand, Result: INT := 10;
+	StringOp: String[30] := '12345678901234567890';
+	StringRes: String[25];
+END_VAR
 		
-		B1:	LD FirstOperand (* 10 {INT} *)
-		ADD SecondOperand (* 20 {INT} *)
-		ST Result (* 20 {INT} *)
-		GT 0 (* TRUE, because 20 > 0 {BOOL} *)
-		JMPC B2
-		(* jump, because CR=TRUE; present value of CR remains {BOOL} *)
-		JMP FarAway (* CR is not defined or present value: *)
-		(* implementation-dependent *)
-		B2: LD StringOp (* 12345678901234567890 {STRING} *)
-		ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
+B1:	LD FirstOperand (* 10 {INT} *)
+ADD SecondOperand (* 20 {INT} *)
+ST Result (* 20 {INT} *)
+GT 0 (* TRUE, because 20 > 0 {BOOL} *)
+JMPC B2
+(* jump, because CR=TRUE; present value of CR remains {BOOL} *)
+JMP FarAway (* CR is not defined or present value: *)
+(* implementation-dependent *)
+B2: LD StringOp (* 12345678901234567890 {STRING} *)
+ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
+	% TODO
 	\caption{Example Instruction List program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:il}
 \end{program}
 
-\begin{program}[h!]
-	\begin{GenericCode}
-		TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
-		VAR d: INT;
-		e: ARRAY [0..9] OF INT; 
-		f: REAL;
-		g: MulVar (Var1:=10, Var2 := 2.3); 
-		h: MulVar;
-		END_VAR
-		d := 10; (* Assignment *)
-		e[0] := d ** 2;   h  := g; (* Two assignments in one line *)
-		d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode}
-	\caption{Example structured text program from the book \cite{johnIEC611313Programming2010}.}
-	\label{code:st}
-\end{program}
+%\begin{program}[h!]
+%	\begin{GenericCode}
+%		TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
+%		VAR d: INT;
+%		e: ARRAY [0..9] OF INT; 
+%		f: REAL;
+%		g: MulVar (Var1:=10, Var2 := 2.3); 
+%		h: MulVar;
+%		END_VAR
+%		d := 10; (* Assignment *)
+%		e[0] := d ** 2;   h  := g; (* Two assignments in one line *)
+%		d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode}
+	% TODO
+%	\caption{Example structured text program from the book \cite{johnIEC611313Programming2010}.}
+%	\label{code:st}
+%\end{program}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{fbd}
+	% TODO
 	\caption{Example function block diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:fbd}
 \end{figure}
@@ -290,6 +291,7 @@ The logic part of POUs may be implemented in one of five distinct programming la
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{ld}
+	% TODO
 	\caption{Example ladder diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:ld}
 \end{figure}
@@ -297,9 +299,81 @@ The logic part of POUs may be implemented in one of five distinct programming la
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.4\textwidth]{sfc}
+	% TODO
 	\caption{Example sequential function chart diagram program from the book \cite{johnIEC611313Programming2010}.}
 	\label{code:sfc}
 \end{figure}
+
+
+\subsection{Structured Text}
+\label{sub:structured text}
+Structured Text is a Pascal-like, high level programming language.
+Structured Text programs consist of a number of statements. In comparison to the textual Instruction List language, instructions are separated by semicolons. 
+%% TODO vllt im impl kapitel erwähnen
+% The implementation mentioned in Chapter \ref{cha:finding unreachable code using a smt-solver} focuses on Structured Text.
+In comparison to the Instruction List language, instructions are separated by semicolons. Comments can be written to the end of the line using double slashes. Furthermore there is the possibility for multiline comments which start with an opening parenthesis and an asterisk and end with an asterisk and a closing parenthesis.
+
+Table \ref{tab:st-statements} illustrates all Structured Text statements. Even though no \emph{goto} statement exists in the standard, it may be implemented by vendors. 
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+
+\begin{table}[h!]
+	%\resizebox{\textwidth}{!}{%
+		\begin{tabular}{|l|l|l|L|}
+			\hline
+			Keyword &
+			Description &
+			Example &
+			Explanation \\ \hline
+			:= &
+			Assignment &
+			d := 10; &
+			Assignment of a calculated value on the right to the identifier on the left \\ \hline
+			&
+			Call of an FB &
+			\begin{tabular}[c]{@{}l@{}}FBName(\\   Par1:=10,\\   Par2:=20,\\   Par3:=\textgreater{}Res);\end{tabular} &
+			Call of another POU of type FB including its parameters. “:=” for input parameters, “=\textgreater{}” for output parameters \\ \hline
+			RETURN &
+			Return &
+			RETURN; &
+			Leave the current POU and return to the calling POU \\ \hline
+			IF &
+			Selection &
+			\begin{tabular}[c]{@{}l@{}}IF d \textless e THEN f:=1;\\ ELSIF d=e THEN f:=2;\\ ELSE f:= 3;\\ END\_IF;\end{tabular} &
+			Selection of alternatives by means of Boolean expressions. \\ \hline
+			CASE &
+			Multi-selection &
+			\begin{tabular}[c]{@{}l@{}}CASE f OF\\   1: g:=11;\\   2: g:=12;\\ ELSE g:=FunName();\\ END\_CASE;\end{tabular} &
+			Selection of a statement block, depending on the value of the expression "f". \\ \hline
+			FOR &
+			Iteration (1) &
+			\begin{tabular}[c]{@{}l@{}}FOR h:=1 TO 10 BY 2 DO\\   f{[}h/2{]} := h;\\ END\_FOR;\end{tabular} &
+			Multiple loop of a statement block with a start and end condition and an increment value. \\ \hline
+			WHILE &
+			Iteration (2) &
+			\begin{tabular}[c]{@{}l@{}}WHILE m \textgreater 1 DO\\   n := n / 2;\\ END\_WHILE;\end{tabular} &
+			Multiple loop of a statement block with end condition at the beginning. \\ \hline
+			REPEAT &
+			Iteration (3) &
+			\begin{tabular}[c]{@{}l@{}}REPEAT\\   i := i*j;\\ UNTIL i \textless 10000\\ END\_REPEAT;\end{tabular} &
+			Multiple loop of a statement block with end condition at the end. \\ \hline
+			EXIT &
+			End of loop &
+			EXIT; &
+			Premature termination of an iteration statement \\ \hline
+			; &
+			Dummy statement &
+			;; &
+			\\ \hline
+		\end{tabular}%
+%	}
+% Richtig zitiert?
+	\caption{All statements defined by the IEC-61131 standard \cite{johnIEC611313Programming2010}. }
+	\label{tab:st-statements}
+\end{table}
+
+% Expressions ?
 
 \clearpage
 \pagebreak
@@ -325,7 +399,6 @@ As described by Prähofer \cite{Prahofer_2012}, the AST representation of an IEC
 	\label{fig:ast basics}
 \end{figure}
 
-% TODO Bild von AST einfügne
 %\subsection{Control Flow Graph}
 \section{Control Flow Graph}
 \label{sub:cfg}
