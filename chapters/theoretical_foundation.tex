@@ -8,24 +8,19 @@
 \label{sec:definitions}
 
 The definition of unreachable code is rather complicated and confusing. 
-Similar terms like dead code and infeasible code are often tossed around and the definition appears to differ in many standards. 
-Sometimes the terms are used as aliases for each other.
+Similar terms like dead code and infeasible code are used and the definition appears to differ in many standards. 
+Sometimes the terms are used for each other.
 
 
 In the following Sections, each term will be defined.
 
 \subsection{Unreachable code}
 \label{sub:unreachable code}
-unreachable code is source code, which can never be reached (during execution). 
+unreachable code is code, which can never be reached (during execution). 
 The causes may either be due to:
 \begin{enumerate}
-	\item Imperative statements that force an unconditional jump (even though there are statements following) as shown in Listing \ref{code:unconditional unreachable code}. Depending on language, these statements are 
-	\begin{itemize}
-		\item break
-		\item return
-		\item goto
-	\end{itemize}
-	\item infeasible conditions as described in section \ref{sub:infeasible code}. 
+	\item Imperative statements that force an unconditional jump (even though there are statements following) as shown in Listing \ref{code:unconditional unreachable code}. Depending on language, these statements are break, return and goto.
+	\item infeasible conditions as described in Section \ref{sub:infeasible code}. 
 \end{enumerate}
 
 
@@ -78,22 +73,15 @@ The causes may either be due to:
 \label{sub:dead code}
 
 Dead code is code, which may be reachable, but is not used any further.
-The most common types of dead code is unused code:
-\begin{itemize}
-	\item Unused variables \cite{Prahofer_2012}
-	\item Unused methods/functions \cite{Romano_2016}
-	\item Unused classes
-	\item Unused files \cite{Boomsma_2012}
-	\item ...
-\end{itemize}
+The most common types of dead code are unused variables \cite{Prahofer_2012}, unused methods/functions \cite{Romano_2016}, unused classes, and unused files \cite{Boomsma_2012}.
 In Listing \ref{code:dead code} some of these errors are presented. As presented, unnecessary assignments are also considered dead code.
 
 
 The term \emph{dead} implies that the counterpart called \emph{live} exists. 
-The \emph{Liveness} of an expression indicates if it has any impact on the program when executed.
-Dead code is usually a sign of an unnecessary baggage and should be deleted, which is often easy since it is not used anyways.
-When dead code is not deleted and more and more instances of dead code are accumulated, it will become harder to maintain and comprehend \cite{Romano_2020}. Dead code may be intended in foresight of extensibility. But when this extensibility is no longer intended, the already implemented mechanisms may include dead code. This code must be refactored or removed, otherwise it results in worse maintainability and 
-source code written in object-oriented programming languages do contain significantly more dead code according to the research paper \cite{Srivastava_1992}.
+The \emph{liveness} of an expression indicates if it has any impact on the program when executed.
+Dead code is usually a sign of an unnecessary baggage and should be deleted, which is often easy since it is not used.
+When dead code is not deleted and more and more instances of dead code are accumulated, it will become harder to maintain and to comprehend source code \cite{Romano_2020}. This code must be refactored or removed, otherwise it results in worse maintainability and 
+source code written in object-oriented programming languages do contain significantly more dead code according to Srivastava \cite{Srivastava_1992}.
 
 
 It is important to note that according to this definition dead code may be reachable, but does not have to be.
@@ -158,15 +146,26 @@ The similarity between unreachable code and dead code is that both do not have a
 
 As mentioned before the sources of these two error types are different.
 Dead code occurs for example, when intended extensibility or features are no longer required and are not deleted or refactored.
-Unreachable code, especially infeasible code, occurs due to faulty logic and may not as straightforward to fix.
+% Unreachable code, especially infeasible code, occurs due to faulty logic and may not as straightforward to fix.
 \subsection{Infeasible Code}
 \label{sub:infeasible code}
 Infeasible code is a subset of unreachable code.
-Infeasible code only occurs due to conditions which always evaluate to false. Another reason could be confusion around expressions \cite{Eichberg_2015}.
+Infeasible code only occurs due to conditions which always evaluate to false. Another reason could be confusion around expressions \cite{Eichberg_2015} (as shown in Figure \ref{fig:operator confusion}).
 
 
 Infeasible code may occur either due to conditions which only consist of boolean literals (and expressions), constants, or as consequence of former conditions, as demonstrated in Listing \ref{code:infeasible code}.
 
+\begin{program}[h!]
+	\begin{JavaCode}
+if(maxBits > 4 || maxBits < 8) {
+	// this condition is always true, since maxBits has to be either greater than 4 OR less than 8
+	// in this case the AND operator was probabaly intended instead 
+	// ...
+}
+	\end{JavaCode}
+	\caption{Example (from Eichberg \cite{Eichberg_2015}) of a confused || conjunction. The \&\& conjunction was probabaly intended, otherwise the condition would always evaluate true.}
+	\label{fig:operator confusion}
+\end{program}
 
 \begin{program}[h!]
 	\begin{JavaCode}
@@ -215,9 +214,9 @@ The standard does not only provide guidelines for manufacturers, but also for pr
 Projects are built of POUs. These organization units are encapsulated, which does not only modularize code, but also enables independent compilation.
 There are three types of POUs \cite{johnIEC611313Programming2010}:
 \begin{itemize}
-	\item \emph{FBs} (\emph{Functionblock}) are the main building blocks of a program. Function blocks can be instantiated. They may contain actual state (like a timer or counter). Function block types are visibly globally, but instances may not be. Inheritance is not intended.
+	\item \emph{Function blocks} (FB) are the main building blocks of a program. Function blocks can be instantiated. They may contain actual state (like a timer or counter). Function block types are visibly globally, but instances may not be. Inheritance is not intended.
 	\item \emph{Programs} represent the main program. These units are not called explicitly by other POUs, but otherwise behave like FBs.
-	\item \emph{Functions} basically are the same as regular, pure functions. Therefore functions do not contain any state and are not able to call Function Blocks, which may contain side effects. 
+	\item \emph{Functions} basically are the same as regular, pure functions. Therefore functions do not contain any state and are not able to call Function blocks, which may contain side effects. 
 \end{itemize}
 POUs contain two parts:
 \begin{itemize}
@@ -233,7 +232,7 @@ Recursion is not allowed, neither directly nor indirectly.
 \label{sub:iec-lang}
 The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
 \begin{itemize}
-	\item \emph{Instruction List} is an assembly like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
+	\item \emph{Instruction List} is an assembler-like programming language (see Listing \ref{code:il}). Other languages are translated into this language.
 	\item \emph{Structured Text} is described in Section \ref{sub:structured text}.
 	\item \emph{Function block Diagram} are partly graphical and partly textual (see Figure \ref{code:fbd}). The language is inspired from the field of signal processing. 
 	\item \emph{Ladder Diagram} is a graphical language, mainly used when processing boolean values (see Figure \ref{code:ld}).
@@ -252,47 +251,26 @@ B1:	LD FirstOperand (* 10 {INT} *)
 ADD SecondOperand (* 20 {INT} *)
 ST Result (* 20 {INT} *)
 GT 0 (* TRUE, because 20 > 0 {BOOL} *)
-JMPC B2
-(* jump, because CR=TRUE; present value of CR remains {BOOL} *)
+JMPC B2 (* jump, because CR=TRUE; present value of CR remains {BOOL} *)
 JMP FarAway (* CR is not defined or present value: *)
 (* implementation-dependent *)
 B2: LD StringOp (* 12345678901234567890 {STRING} *)
 ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
-	% TODO
-	\caption{Example Instruction List program from the book \cite{johnIEC611313Programming2010}.}
+	\caption{Example Instruction List program from the book \cite{johnIEC611313Programming2010}. The value and datatype of the \emph{Current Result} (CR) is shown besides the statements. At first the value of variable \emph{FirstOperand} is stored in the CR and then 10 is added and stored into \emph{Result}. Since 20 is greater than zero, the conditional jump in line 11 goes to line 14. In the end the value of \emph{StringOp} is stored in \emph{StringRes}. }
 	\label{code:il}
 \end{program}
-
-%\begin{program}[h!]
-%	\begin{GenericCode}
-%		TYPE MulVar: STRUCT Var1: INT; Var2: REAL; END_STRUCT; END_TYPE
-%		VAR d: INT;
-%		e: ARRAY [0..9] OF INT; 
-%		f: REAL;
-%		g: MulVar (Var1:=10, Var2 := 2.3); 
-%		h: MulVar;
-%		END_VAR
-%		d := 10; (* Assignment *)
-%		e[0] := d ** 2;   h  := g; (* Two assignments in one line *)
-%		d := REAL_TO_INT(f); (* Assignment evaluating a function call *)\end{GenericCode}
-	% TODO
-%	\caption{Example structured text program from the book \cite{johnIEC611313Programming2010}.}
-%	\label{code:st}
-%\end{program}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.7\textwidth]{fbd}
-	% TODO
-	\caption{Example function block diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\caption{Example function block diagram program from the book \cite{johnIEC611313Programming2010}. Note that the values on the left side are number literals. The incoming lines into a block are operands, while the blocks serve as operators. The value of \emph{a} is 6 and the value fo b equals to 15. Afterwards both results are multiplied (the result is 90) at \emph{c}. This value is stored in \emph{Var1} and is used as a dividend. This value will be divided by 9 and stored into \emph{Var2}.}
 	\label{code:fbd}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{ld}
-	% TODO
-	\caption{Example ladder diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\caption{Example ladder diagram program from the book \cite{johnIEC611313Programming2010}. This example is a condition and can be read as: $Var1 \land Var2 \land (Var3 \lor Var4)$ and the result is written to \emph{VarOut}. }
 	\label{code:ld}
 \end{figure}
 
@@ -300,7 +278,7 @@ ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
 	\centering
 	\includegraphics[width=0.4\textwidth]{sfc}
 	% TODO
-	\caption{Example sequential function chart diagram program from the book \cite{johnIEC611313Programming2010}.}
+	\caption{Example sequential function chart diagram program from the book \cite{johnIEC611313Programming2010}. This network represents a loop, which contains two simultaneous tasks, that are executed. The indicators \emph{StartReady}, \emph{SimultanReady} and \emph{NewLoop} indicate, if the task from the previous block(s) finished their calculations and activates the next blocks.}
 	\label{code:sfc}
 \end{figure}
 
@@ -308,15 +286,13 @@ ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
 \subsection{Structured Text}
 \label{sub:structured text}
 Structured Text is a Pascal-like, high level programming language.
-Structured Text programs consist of a number of statements. In comparison to the textual Instruction List language, instructions are separated by semicolons. 
+Structured Text programs consist of a number of statements.  
 %% TODO vllt im impl kapitel erwähnen
 % The implementation mentioned in Chapter \ref{cha:finding unreachable code using a smt-solver} focuses on Structured Text.
 In comparison to the Instruction List language, instructions are separated by semicolons. Comments can be written to the end of the line using double slashes. Furthermore there is the possibility for multiline comments which start with an opening parenthesis and an asterisk and end with an asterisk and a closing parenthesis.
 
 Table \ref{tab:st-statements} illustrates all Structured Text statements. Even though no \emph{goto} statement exists in the standard, it may be implemented by vendors. 
 
-% Please add the following required packages to your document preamble:
-% \usepackage{graphicx}
 
 \begin{table}[h!]
 	%\resizebox{\textwidth}{!}{%
@@ -378,13 +354,8 @@ Table \ref{tab:st-statements} illustrates all Structured Text statements. Even t
 \clearpage
 \pagebreak
 
-% TODO
-% \section{Static Code Analysis}
-% Static code analysis is used to analyze source code for a wide range of different code smells without actually executing the code. 
-% The goal is to detect potential errors early as well as hinting to problematic code, which either is too complex or contains unwanted constructs potentially causing errors. 
-% Many
 
-% TODO 
+
 %\subsection{Abstract Syntax Tree}
 \section{Abstract Syntax Tree}
 \label{sub:ast}
@@ -416,69 +387,69 @@ Usually a CFG is created for each individual procedure/function.
 	\label{fig:cfg basics}
 \end{figure}
 
-% TODO Subsection über KEMRO-IEC ? oder in IMPL erwähnen... --> In Impl erwähnen
-
 \section{Satisfiable Modulo Theory}
 
-Satisfiable modulo theory (short SMT) is defined as stated in \cite{demouraZ3EfficientSMT2008}:
+Satisfiable modulo theory (SMT) evaluates the satisfiability of a given expression. 
+The basis of an SMT solver is a SAT solver, which solves boolean formulas only, whereas SMT solvers are extended by arithmetic expressions, bit vectors, arrays, quantifiers, integer, rational and other first order theories. 
+SMT solvers are also able to determine values for defined variables in formulas. 
 
-\begin{quote}
-	Satisfiability modulo theories (SMT) generalizes boolean satisfiability (SAT) by
-	adding equality reasoning, arithmetic, fixed-size bit vectors, arrays, quantifiers,
-	and other useful first-order theories. An SMT solver is a tool for deciding the satisfiability (or dually the validity) of formulas in these theories. SMT solvers enable
-	applications such as extended static checking, predicate abstraction, test case generation, and bounded model checking over infinite domains, to mention a few. 
-\end{quote}
 
-The basis of an SMT-Solver is a SAT-Solver, which solves boolean formulas only. SMT-Solvers may function as a separate program or may be imported as a module/package into a program. 
-Popular SMT-Solvers are for example Z3 \cite{demouraZ3EfficientSMT2008}, Princess \cite{princess08}, Yices2 \cite{Dutertre:cav2014} and many more.
+SMT solvers may function as a separate program or may be imported as a module/package into a program. 
+Popular SMT solvers are for example Z3 \cite{demouraZ3EfficientSMT2008}, Princess \cite{princess08} and Yices2 \cite{Dutertre:cav2014}.
 
 \subsection{SMT-LIB}
-SMT-LIB offers standardization to implementing SMT-Solvers by defining a common input- and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
+SMT-LIB2 offers standardization to implementing SMT solvers by defining a common input and output format, providing descriptions of background theories and more \cite{cokSMTLIBv2LanguageTools}. % https://smtlib.cs.uiowa.edu/
 By using the same input and output format SMT-Solvers may be exchanged at any time. 
-This format is a LISP, which has some additional special functions used for direct interaction with the SMT-Solver. Since LISP is a functional programming language, the same characteristics are applied to SMT-Lib.
-For example, mutations are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
+This format is similar to the Lisp language, which has some additional special functions used for direct interaction with the SMT-Solver. Since Lisp is a functional programming language, the same characteristics are applied to SMT-LIB2.
+For example, reassignments of variables are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
 Usually a SMT-LIB programm (see Listing \ref{code:smt-lib}) begins with declaring functions. Variables may also be represented as functions. 
-Afterwards the given Boolean Expression is formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
-The last part contains an instruction for the SMT-Solver to check the satisfiability. 
-Since solvers are implemented using backtracking it is also possible to gain the calculated values which fit the given expression, if it is satisfiable. 
-SMT-Solvers may also implement the simplification of a given expression.
+Afterwards the declaring functions given Boolean Expressions are formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
+The last part contains an instruction for the SMT solver to check the satisfiability. 
+SMT-LIB2 also provides an instruction to get a possible set of values of all variables, provided the formula is satisfiable.
 
-% TODO 
+SMT solvers may also implement the simplification of a given expression.
+
+
 \begin{program}[h!]
 	\begin{LispCode}
-		; declaring variables
-		(declare-fun x () Int)
-		(declare-fun y () Int)
-		(declare-fun z () Int)
+; declaring variables
+(declare-fun x () Int)
+(declare-fun y () Int)
+(declare-fun z () Int)
 		
-		(push 2) ; push next 2 constraints to stack
-		; Add constraint
-		(assert (= x y))
-		; Add another constraint
-		(assert (> y z))
-		; Check satisfiability
-		(check-sat)
-		; => sat
-		(push 1) ; push next constraint to stack
-		; Add another constraint
-		(assert (= z x))
-		(check-sat)
-		; => unsat
-		(pop 1) ; pop last constraint from stack
-		(check-sat)
-		; => sat
-		; get possible values of variables
-		(get-value (x y z))
-		; => ((x 0)
-		;     (y 0)
-		;     (z (- 1)))
-		(pop 2) ; pop the last 2 constraints
-		(push 1) ; push next constraint to the stack
-		(assert (and (= x y) (> x z)))
-		(check-sat)
-		; => sat\end{LispCode}
-	\caption{SMT-Lib example program. Push and pop instructions add or remove the next $n$ assert statements. Checking satisfiability is done by the \emph{check-sat} instruction, returning either \emph{sat} or \emph{unsat}. The \emph{get-value} instruction delivers a possible set of assignments of given variables. }
+(push 2) ; push next 2 constraints to stack
+; Add constraint
+(assert (= x y))
+; Add another constraint
+(assert (> y z))
+; Check satisfiability
+(check-sat) ; (1)
+(push 1) ; push next constraint to stack
+; Add another constraint
+(assert (= z x))
+(check-sat) ; (2)
+(pop 1) ; pop last constraint from stack
+(check-sat) ; (3)
+; get possible values of variables
+(get-value (x y z)) ; (4)
+(pop 2) ; pop the last 2 constraints
+(push 1) ; push next constraint to the stack
+(assert (and (= x y) (> x z)))
+(check-sat) ; (5)\end{LispCode}
+	\caption{SMT-LIB2 example code. Push and pop instructions add or remove the next $n$ assert statements. Checking satisfiability is done by the \emph{check-sat} instruction, returning either \emph{sat} or \emph{unsat}. The \emph{get-value} instruction delivers a possible set of assignments of given variables. }
 	\label{code:smt-lib}
+\end{program}
+
+% TODO
+\begin{program}[h!]
+	\begin{GenericCode}
+sat (1)
+unsat(2)
+sat(3)
+((x 0)(y 0)(z (- 1)))(4)
+sat (5)\end{GenericCode}
+	\caption{Output of SMT-LIB2 code of Listing \ref{code:smt-lib}. The result in the first line is the result to the statement in line 12 of \ref{code:smt-lib}}
+	\label{code:smt-lib out}
 \end{program}
 
 

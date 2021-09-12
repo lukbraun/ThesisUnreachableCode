@@ -13,12 +13,12 @@ The accuracy for finding unreachable code increases with each tool presented.
 The examples are provided in form of Java source code beginning with the Java compiler (OpenJDK \cite{OpenJDK} implementation) itself, which verifies the correctness of source code before code generation. 
 
 
-One of the most important tools a programmer uses is arguably the Integrated Development Environment (IDE), which is capable of additional code inspection. 
-The most popular Java IDEs have been Eclipse \cite{incCommunityOpenInnovation} and IntelliJ \cite{IntelliJIDEACapable}. 
+One of the most important tools a programmer uses is the Integrated Development Environment (IDE), which is capable of additional code inspection and highlighting errors and warnings. 
+The most popular Java IDEs are Eclipse \cite{incCommunityOpenInnovation} and IntelliJ \cite{IntelliJIDEACapable}. 
 Possibly both may be improved by installing additional plugins for checking code.
 
 
-Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud and usually is part of a continous integration pipeline. It offers a wide variety of checks including a more in depth unreachable code analysis.
+Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud and usually is part of a continous integration pipeline. It offers a wide variety of checks including a more in-depth unreachable code analysis.
 
 
 Some instances of unreachable code may not be found using the tools mentioned before. For a more advanced approach statements have to be evaluated. Infeasible path conditions, described in Section \ref{sub:infeasible code}, may be found by using a mathematical prover or SMT-Solver.
@@ -37,7 +37,7 @@ The idea is that there must be some possible execution path from the beginning o
 \end{quote}
 
 Since values are not considered during this analysis, it is impossible to detect infeasible code as described in Listing \ref{code:Java infeasible undetected}.
- Loops are the exception here, but only conditions containing literal boolean values will be checked and may result in a compile time error as demonstrated by Listing \ref{code:Java loop unreachable}. The rationale behind not considering the values of variables and even constants is to use them as flags (see Listing \ref{code:Java flags}).
+ Loops are the exception here, but only conditions containing literal boolean values will be checked and may result in a compile time error as demonstrated by Listing \ref{code:Java loop unreachable}. The rationale behind not considering the values of variables and even constants is to use them to switch on and off source code fragments (see Listing \ref{code:Java flags}).
 
 
 Unexpected return statements turn the following statements unreachable. As shown in Listing \ref{code:Java unexpected return} and mentioned before, conditions of if-then-else blocks are not evaluated, even if they contain only (boolean) literals. 
@@ -151,7 +151,7 @@ void testBreak2() {
 \section{Integrated Development Environments}
 \label{sec:intelliJ}
 Integrated Development Environments (IDE) are used by almost every software developer daily and are an integral tool for creating and refactoring code.
-In comparison to simple text editors IDEs only support a few programming languages by providing some sort of static code analysis to assist a developer while writing code. 
+In comparison to simple text editors IDEs extend text editors with tools that make it one the on side easier to write code (e.g. by providing snippets that can be inserted, autocomplete) and by providing some sort of static code analysis to assist a developer while writing code.
 Depending on the IDE, static code analysis can be configured to be more or less strict. 
 When the IDE contains an extensive plugin system, then custom-made analysis tools may be used for even more precise method to find potential bugs.
 
@@ -159,8 +159,6 @@ When the IDE contains an extensive plugin system, then custom-made analysis tool
 Regarding unreachable code the following IDEs were analyzed:
 \begin{itemize}
 	\item \emph{Eclipse} \cite{incCommunityOpenInnovation} is an IDE primarily focused on developing Java projects. The IDE provides its own compiler \cite{teamJDTCoreComponent}, which does not only compile projects, but is also responsible for static code analysis. Additional to the checks by the OpenJDK \cite{OpenJDK} Java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in Listing \ref{code:Java eclipse intelij always true or false}. Generally, the eclipse Java compiler is very basic regarding unreachable code detection. As shown in Listing \ref{code:Java eclipse fail to find this} its compiler does not even consider the same condition in an if/else-if block. Other datatypes (e.g., int) are also taken into account. Besides that Eclipse is extensible and many additional tools for more sophisticated analysis exist.
-	
-	% A basic, configurable inspection tool is integrated. Additional to the checks by the Java compiler, conditions in if-then-else expressions are also evaluated and checked by default. When values of variables are known, then they will be considered in the analysis as shown in Listing \ref{code:Java eclipse intelij always true or false}. Generally, the inspector is very basic regarding unreachable code detection. As shown in Listing \ref{code:Java eclipse fail to find this} its inspector does not even consider the same condition in an if/else-if block. Other datatypes (e.g., int) are also taken into account. Besides that Eclipse is extensible and many additional tools for more sophisticated analysis exist.
 	\item \emph{IntelliJ Idea} \cite{IntelliJIDEACapable} is an IDE used for developing projects in various popular programming languages (e.g., Java, C\#, Python, JavaScript). For the Java language, a code inspector can be configured to find different categories of errors. By default two important rules are activated to deliver warnings: 
 	\begin{itemize}
 		\item \emph{Constant conditional expressions}, which do not only check for boolean literals in conditions, but also take values of variables, in case they always have the same value, and even other data types (e.g., int) into account as shown in Listing \ref{code:Java eclipse intelij always true or false}
@@ -230,7 +228,7 @@ void duplicateConditions(int s_operationHour, int m_operationHour) {
 	\label{code:Java intelij duplicate conditions}
 \end{program}
 \newpage
-\section{Sonarqube and Sonarlint} % Could be interessting since it is very strict and performs more advanced analysis
+\section{Sonarqube and Sonarlint} 
 \label{sec:sonar}
 \emph{Sonarqube} \cite{sonarqube} and \emph{Sonarlint} \cite{SonarLintFixIssues} are products created by \emph{Sonarsource} \cite{CodeQualityCode}. Sonarqube is a static code analysis solution used in conjunction with a build server.
 Commonly this analysis is either triggered after pushing commits, scheduled at certain times of the day or a combination of both.
