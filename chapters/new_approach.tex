@@ -34,27 +34,30 @@ When rules are not met, violations will be generated. They contain position, cau
 The detection of unreachable code will be implemented in form of a rule as seen in Figure \ref{fig:unreachable-architecture-overview}, the next Section \ref{sec:translation} covers the translation from the abstract syntax tree to a general control flow graph. 
 Afterwards the instructions within the control flow graph will be transformed as described in Section \ref{subsec:translate instructions}.
 The analysis is covered in Section \ref{sec:analysis}.
-\pagebreak
-\begin{figure}
+% \pagebreak
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{static-code-analysis}
 	\caption{Architectural overview of the static code analysis tool for IEC source code. After parsing IEC source code, the AST will be passed to the RuleExecutor, which triggers only the configured rules. For more advanced analysis, the AST may be transformed into a different representation. When the source code does not conform to the rules violations will be generated, which can be integrated with Sonarqube.}
 	\label{fig:general architecture}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=1\textwidth]{unreachable-architecture-overview}
 	\caption{General overview of the implementation of the unreachable code detection rule. Each step is annotated in which section it is described. }
 	\label{fig:unreachable-architecture-overview}
 \end{figure}
 
+\pagebreak
 \section{Translation of Functions}
 \label{sec:translation}
 For every function the control flow graph will be calculated and used as the basis. 
 Consider the concrete example show in Figure \ref{code:transformation example} as input. 
 After parsing the abstract syntax tree will be generated and then used to build the control flow graph (demonstrated in Figure \ref{fig:ast to cfg}).
 Information about parameters and global-/system variables also need to be provided in order to handle function-/procedure calls. 
+% \clearpage
+
 Two separate procedures will be performed on this control flow graph.
 \begin{enumerate}
 	\item \emph{Unreachable code due to unconditional jumps} is easy to find after the control flow graph was created. Every block (except the beginning block) which does not have any incoming edges must be unreachable.
@@ -129,15 +132,15 @@ This kind of representation makes it easy to work with, since it is a very easy,
 	\caption{\emph{AST}-like representation of instructions. }
 	\label{fig:smtobject}
 \end{figure}
-\clearpage
-\pagebreak
+% \clearpage
+% \pagebreak
 \section{Analysis}
 \label{sec:analysis}
 After the translation of all functions and instructions the analysis begins. As mentioned in the introduction of this chapter the control flow graph of every function (and procedure) will be traversed. The analysis begins at the single begin block of the graph and ends when all feasible paths reached the exit block.  
 For each instruction block the instructions will be evaluated. The resulting state must be carried along the analysis and merged correctly to assure valid results. At the end of an instruction block an SMT-solver is used to determine if the current state is feasible or not. Infeasible state may be reached by a combination of conditions. If the current state is infeasible, the \emph{next} block must be unreachable, since the condition at the end of an instruction block determines which branch the flow follows. 
 For the determination, if the current state is feasible or not, the SMT solver Z3 \cite{demouraZ3EfficientSMT2008} is used. The state will be simply translated into the universal, standardized, LISP-like SMT-LIB2 language (e.g., \ref{code:translation}) which most of the common SMT-solvers are able to interpret. If an instruction block is reachable (at least on one occasion), it will be marked as reachable. At the end of the analysis, all remaining instruction blocks are marked unreachable.
-\clearpage
-\pagebreak
+% \clearpage
+% \pagebreak
 \begin{program}[h!]
 	\begin{GenericCode}
 procedure $mergeState$($\downarrow$ $instruction$, $\updownarrow$ $state$) begin
@@ -206,7 +209,7 @@ end	\end{GenericCode}
 	\label{code:instruction block analyzer}
 \end{program}
 
-% TODO: add example for translation
+
 \begin{program}[h!]
 	\begin{GenericCode}
 $i$ $\leftarrow$ 1

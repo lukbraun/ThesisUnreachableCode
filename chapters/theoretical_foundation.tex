@@ -130,7 +130,6 @@ Some standards, like MITRE-CWE \cite{CWECWE561Dead} define dead code as follows:
 This definition does not have anything in common with the one provided before. According to this standard, dead code is unreachable code, since it cannot be executed. But unnecessary assignments are not considered dead code, but has its own category \emph{Assignment to Variable Without Use}.
 Both of these issues are considered as \emph{Irrelevant Code}.
 
-\pagebreak
 In contrast the standard MISRA-C \cite{motorindustrysoftwarereliabilityassociationMISRAC2004Guidelines2008} defines unreachable code as follows:
 \begin{quote}
 	Rule 14.1 (required): There shall be no unreachable code.
@@ -208,7 +207,7 @@ The standard is maintained by the independent organization PLCOpen \cite{eldijkW
 
 
 The standard does not only provide guidelines for manufacturers, but also for projects of end users \cite{johnIEC611313Programming2010}.
-\pagebreak
+
 \subsection{Program Organization Unit (POU)}
 \label{sub:pou}
 Projects are built of POUs. These organization units are encapsulated, which does not only modularize code, but also enables independent compilation.
@@ -227,7 +226,7 @@ POUs can be called with or without parameters. Parameters may be provided direct
 
 Recursion is not allowed, neither directly nor indirectly. 
 
-
+\pagebreak
 \subsection{Languages}
 \label{sub:iec-lang}
 The logic part of POUs may be implemented in one of five distinct programming languages \cite{johnIEC611313Programming2010}:
@@ -277,7 +276,6 @@ ST StringRes (* 12345678901234567890 {STRING} *)\end{GenericCode}
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.4\textwidth]{sfc}
-	% TODO
 	\caption{Example sequential function chart diagram program from the book \cite{johnIEC611313Programming2010}. This network represents a loop, which contains two simultaneous tasks, that are executed. The indicators \emph{StartReady}, \emph{SimultanReady} and \emph{NewLoop} indicate, if the task from the previous block(s) finished their calculations and activates the next blocks.}
 	\label{code:sfc}
 \end{figure}
@@ -402,7 +400,7 @@ SMT-LIB2 offers standardization to implementing SMT solvers by defining a common
 By using the same input and output format SMT-Solvers may be exchanged at any time. 
 This format is similar to the Lisp language, which has some additional special functions used for direct interaction with the SMT-Solver. Since Lisp is a functional programming language, the same characteristics are applied to SMT-LIB2.
 For example, reassignments of variables are not permitted and there is no possibility of using traditional loops (which may be replaced by recursion).
-Usually a SMT-LIB programm (see Listing \ref{code:smt-lib}) begins with declaring functions. Variables may also be represented as functions. 
+Usually a SMT-LIB programm (see Listing \ref{code:smt-lib} and Listing \ref{code:smt-lib out} for the results) begins with declaring functions. Variables may also be represented as functions. 
 Afterwards the declaring functions given Boolean Expressions are formulated. Since there is no direct way to initialize a variable with a value, it has to be done by using the equality function. 
 The last part contains an instruction for the SMT solver to check the satisfiability. 
 SMT-LIB2 also provides an instruction to get a possible set of values of all variables, provided the formula is satisfiable.
@@ -443,18 +441,13 @@ SMT solvers may also implement the simplification of a given expression.
 % TODO
 \begin{program}[h!]
 	\begin{GenericCode}
-sat (1)
-unsat
-(2)
-sat
-(3)
-((x 0)
-(y 0)
-(z (- 1)))
-(4)
-sat (5)
+sat ; (1)
+unsat ; (2)
+sat ; (3)
+((x 0) (y 0) (z (- 1))) ; (4)
+sat ; (5)
 \end{GenericCode}
-	\caption{Output of SMT-LIB2 code of Listing \ref{code:smt-lib}. The result in the first line is the result to the statement in line 12 of \ref{code:smt-lib}}
+	\caption{Output of SMT-LIB2 code of Listing \ref{code:smt-lib}. Each line represents a result, which is linked to an instruction from Listing \ref{code:smt-lib} (via comment next to them).}
 	\label{code:smt-lib out}
 \end{program}
 
