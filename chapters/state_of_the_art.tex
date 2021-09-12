@@ -3,9 +3,9 @@
 \chapter{State of the Art}
 \label{cha:state of the art}
 
-Analyzing code is a central part of software development. Naturally this process can be automated to some degree using various static code analysis tools. 
+Analyzing code is a central part of software development. Naturally, this process can be automated to some degree using various static code analysis tools. 
 Some of these tools are applied at different stages during development ranging from compilation time to static code analysis in the cloud. 
-Generally static code analysis benefits by detecting errors and problematic constructs early, but also highlights code that does not adhere to coding guidelines.
+Generally, static code analysis benefits by detecting errors and problematic constructs early, but also highlights code that does not adhere to coding guidelines.
 
 
 In this chapter multiple static code analysis tools will be presented, ranging in quality for detecting bugs (with a focus on unreachable code).
@@ -18,7 +18,7 @@ The most popular Java IDEs are Eclipse \cite{incCommunityOpenInnovation} and Int
 Possibly both may be improved by installing additional plugins for checking code.
 
 
-Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud and usually is part of a continous integration pipeline. It offers a wide variety of checks including a more in-depth unreachable code analysis.
+Sonarqube \cite{sonarqube} is a static code analysis tool hosted in the cloud and usually is part of a continuous integration pipeline. It offers a wide variety of checks including a more in-depth unreachable code analysis.
 
 
 Some instances of unreachable code may not be found using the tools mentioned before. For a more advanced approach statements have to be evaluated. Infeasible path conditions, described in Section \ref{sub:infeasible code}, may be found by using a mathematical prover or SMT-Solver.
@@ -28,7 +28,7 @@ Some instances of unreachable code may not be found using the tools mentioned be
 \label{sec:Java compiler}
 % Javac also used by IDEs. 
 
-The Java compiler (OpenJDK \cite{OpenJDK}) performs checks regarding unreachable code that strictly results in a compile time error. 
+The Java compiler (OpenJDK \cite{OpenJDK}) performs checks regarding unreachable code that strictly result in a compile time error. 
 In the official documentation \cite{Chapter14Blocks} unreachable code is defined as follows:
 \begin{quote}
 This section is devoted to a precise explanation of the word "reachable." 
@@ -151,7 +151,7 @@ void testBreak2() {
 \section{Integrated Development Environments}
 \label{sec:intelliJ}
 Integrated Development Environments (IDE) are used by almost every software developer daily and are an integral tool for creating and refactoring code.
-In comparison to simple text editors IDEs extend text editors with tools that make it one the on side easier to write code (e.g. by providing snippets that can be inserted, autocomplete) and by providing some sort of static code analysis to assist a developer while writing code.
+In comparison to simple text editors IDEs extend text editors with tools that make it one the on side easier to write code (e.g., by providing snippets that can be inserted, autocomplete) and by providing some sort of static code analysis to assist a developer while writing code.
 Depending on the IDE, static code analysis can be configured to be more or less strict. 
 When the IDE contains an extensive plugin system, then custom-made analysis tools may be used for even more precise method to find potential bugs.
 

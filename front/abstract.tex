@@ -17,12 +17,12 @@
 % Eher als Prototyp zu betrachten, wird aber in Zukunft weiter geführt werden.
 
 This paper is about the detection of unreachable code in source code. 
-Unreachable code has two different causes, on the one hand by unconditional jumps and on the other hand by unfeasible conditions.
+Unreachable code has two different causes, on the one hand, by unconditional jumps and, on the other hand, by unfeasible conditions.
 
 Unreachable code is not only checked by specific static code analysis tools, but also provided as a check by the compiler or an integrated development environment. There are many solutions for different programming languages, but they do not check unreachable code to the same extent. For example, compilers usually do not detect unreachable code, while others are designed to provide a translation error when unreachable code occurs.
 
 
 In this thesis, detection of unreachable code was built into an existing static code analysis targeting Structured Text, a Pascal-like language included in the IEC-61131-3 standard. This analysis requires the representation of the program to be analyzed in the form of a control flow graph, because this graphical representation transfers sequences without jumps into nodes, while jumps are represented in the form of edges. Possible values are carried along for each variable in the form of constraints. These constraints can be translated into a language that an SMT solver checks for satisfiability. 
 
-At this point, the implemented approach only works on small, constructed examples. For this, the implementation is able to find special cases of unreachable code that no other tool studied was able to find. Since not all language features were taken into account (e.g. arrays, structures) the implementation is not complete and should therefore rather be considered as incomplete.
+At this point, the implemented approach only works on small, constructed examples. For this, the implementation is able to find special cases of unreachable code that no other tool studied was able to find. Since not all language features were taken into account (e.g., arrays, structures) the implementation is not complete and should therefore rather be considered as incomplete.
 

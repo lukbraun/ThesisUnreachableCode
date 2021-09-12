@@ -3,17 +3,19 @@
 \chapter{Conclusion}
 \label{cha:conclusion}
 
-Even though procedures are checking intraprocedurally, rather than interprocedurally, the implementation provides good results. It is not only able to find basic instances of unreachable code, but also rather complicated incidents, which cannot be found by going for a traditional approach. 
+The developed approach examines every possible path of a control flow graph and interprets all instructions, such as assignments, conditions and function/procedure calls for satisfiability. If a block can never be visited by the combination of previous assignments and conditions it is unreachable.
+
+Even though procedures are checked intraprocedurally, rather than interprocedurally, the implementation provides good results. It is not only able to find basic instances of unreachable code, but also rather complicated incidents, which cannot be found by going for a traditional approach. 
 The implementation could be the basis for other checks. SMT-solvers simplify checking predicates and the already existing architecture keeps the state of variables in check. 
-Implementing different rules on top of that architecture may enable sophisticated checks.
+Implementing different rules on top of that architecture may enable sophisticated checks, e.g., unnecessary code.
 This possibility may be explored in the future.
 
 
-As mentioned in a previous Section \ref{sub:problems and barriers}, the downside of this approach is runtime. Programs containing loops, especially when nested, create many incidents that have to be checked. Since loops are one of the most essential instructions in programming, they occur often naturally. 
+As mentioned in Section \ref{sub:problems and barriers}, the downside of this approach is runtime. Programs containing loops, especially when nested, create many incidents that have to be checked. Since loops are one of the most essential instructions in programming, they occur often naturally. 
 This complexity has to be addressed, because otherwise it does not make any sense to use this analysis in production, especially for bigger projects.
 
 
-As demonstrated in Section \ref{code:hard example 1}, using correct configuration may be able to discover instances of unreachable code, which no other tool described in Chapter \ref{cha:state of the art} would be able to do. But this can only be done if the correct configuration is known, possibly leading to false positives. It is questionable, if this approach is practicable.
+As demonstrated in Section \ref{code:hard example 1}, using correct configuration may be able to discover instances of unreachable code, which no other tool described in Chapter \ref{cha:state of the art} would be able to do. But this can only be done if the correct configuration is known, possibly leading to false positives. It is questionable if this approach is practicable.
 
 
 Other tools, like sonarqube, as described in Section \ref{sec:sonar}, for example, do not offer to check loops to a full extent, but still manage to find a decent number of violations. Joogie, as described in Section \ref{sec:sca paper}, simplifies loops into three unwindings. Similar forms of preprocessing could reduce runtime significantly by trading a little bit of accuracy, making it usable in production environments. 

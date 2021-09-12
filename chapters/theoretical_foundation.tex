@@ -444,10 +444,16 @@ SMT solvers may also implement the simplification of a given expression.
 \begin{program}[h!]
 	\begin{GenericCode}
 sat (1)
-unsat(2)
-sat(3)
-((x 0)(y 0)(z (- 1)))(4)
-sat (5)\end{GenericCode}
+unsat
+(2)
+sat
+(3)
+((x 0)
+(y 0)
+(z (- 1)))
+(4)
+sat (5)
+\end{GenericCode}
 	\caption{Output of SMT-LIB2 code of Listing \ref{code:smt-lib}. The result in the first line is the result to the statement in line 12 of \ref{code:smt-lib}}
 	\label{code:smt-lib out}
 \end{program}
